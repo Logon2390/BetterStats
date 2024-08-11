@@ -8,8 +8,6 @@ using namespace geode::prelude;
 #include <matjson/stl_serialize.hpp>
 #include <matjson.hpp>
 #include <chrono>
-#include <iomanip>
-#include <fmt/core.h>
 
 struct LevelStats {
 	int attempts;
@@ -44,7 +42,6 @@ struct matjson::Serialize<LevelStats> {
 	static bool is_json(Value const& value) {
 		return value.is_object();
 	}
-		
 };
 
 LevelStats data;
@@ -53,6 +50,7 @@ int practiceAttempts = 0;
 int currentPracticeRun = 0;
 int bestPracticeRun = 0;
 bool practice = false;
+bool validPracticeRun = false;
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
@@ -132,7 +130,6 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	}
 };
 
-
 class $modify(PlayLayer){
 	bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects){
 		if(!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
@@ -143,7 +140,7 @@ class $modify(PlayLayer){
 	}
 
 	void levelComplete(){
-		if(m_isPracticeMode){
+		if(m_isPracticeMode && validPracticeRun){
 			bestPracticeRun = 
 				currentPracticeRun <= bestPracticeRun || bestPracticeRun == 0 ? 
 				currentPracticeRun : bestPracticeRun;
@@ -151,10 +148,10 @@ class $modify(PlayLayer){
 		PlayLayer::levelComplete();
 	}
 
-	void togglePracticeMode(bool practiceMode) {
+	void togglePracticeMode(bool practiceMode){
 		currentPracticeRun = 1;
 		practice = true;
-		PlayLayer::togglePracticeMode(practiceMode);
+		validPracticeRun = !m_isPracticeMode && m_attemptTime <= 3;
 	}
 
 	void updateAttempts(){
@@ -167,20 +164,34 @@ class $modify(PlayLayer){
 
 	void resetLevel(){
 		attemptTime += this->m_attemptTime;
+		
+		if (m_isPracticeMode && m_checkpointArray->count() == 0){
+			validPracticeRun = true; 
+			log::info("valid practice run []");
+		}
 		PlayLayer::resetLevel();
 	}
+
+/*
+	void resetLevelFromStart(){
+		validPracticeRun = !m_isPracticeMode?
+		PlayLayer::resetLevelFromStart();
+	}
+	*/
 
 	void onQuit(){
 		attemptTime += this->m_attemptTime;
 		data.attempts = m_level->m_attempts;
 		data.time_played += attemptTime;
 
-		if(practice) {
+		if(practice){
 			data.p_attempts += practiceAttempts;
 			data.first_practice = data.first_practice == 0 ? bestPracticeRun : data.first_practice;
-			data.best_practice = 
+			if(validPracticeRun){
+				data.best_practice = 
 				bestPracticeRun <= data.best_practice || data.best_practice == 0 ? 
 				bestPracticeRun : data.best_practice;
+			}
 		}
 		attemptTime = 0;
 
