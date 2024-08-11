@@ -51,6 +51,7 @@ int currentPracticeRun = 0;
 int bestPracticeRun = 0;
 bool practice = false;
 bool validPracticeRun = false;
+bool savePracticeData = false;
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
@@ -103,8 +104,8 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 							+ "<cc>Practice Attempts</c>: " + std::to_string(data.p_attempts) + "\n"
 							+ "<cj>Jumps</c>: " + std::to_string(m_level->m_jumps) + "\n\n"
 
-							+ "First Practice Run: " + std::to_string(data.first_practice) + "\n"
-							+ "Best Practice Run: " + std::to_string(data.best_practice) + "\n\n"
+							+ "<cl>First Practice Run</c>: " + std::to_string(data.first_practice) + "\n"
+							+ "<cb>Best Practice Run</c>: " + std::to_string(data.best_practice) + "\n\n"
 								
 							+"<cp>Time Played</c>: " 
 								+ (hours.count() == 0 ? "" : std::to_string(hours.count()) + "h ") 
@@ -136,23 +137,28 @@ class $modify(PlayLayer){
 		practiceAttempts = 1;
 		bestPracticeRun = 0;
 		practice = m_isPracticeMode;
+		practice = false;
 		return true;
 	}
 
+
 	void levelComplete(){
 		if(m_isPracticeMode && validPracticeRun){
-			bestPracticeRun = 
-				currentPracticeRun <= bestPracticeRun || bestPracticeRun == 0 ? 
+			savePracticeData = true;
+			bestPracticeRun = currentPracticeRun <= bestPracticeRun || bestPracticeRun == 0 ? 
 				currentPracticeRun : bestPracticeRun;
 		}
 		PlayLayer::levelComplete();
 	}
 
+
 	void togglePracticeMode(bool practiceMode){
 		currentPracticeRun = 1;
 		practice = true;
 		validPracticeRun = !m_isPracticeMode && m_attemptTime <= 3;
+		PlayLayer::togglePracticeMode(practiceMode);
 	}
+
 
 	void updateAttempts(){
 		if(m_isPracticeMode) {
@@ -162,22 +168,14 @@ class $modify(PlayLayer){
 		PlayLayer::updateAttempts();
 	}
 
+
 	void resetLevel(){
 		attemptTime += this->m_attemptTime;
-		
-		if (m_isPracticeMode && m_checkpointArray->count() == 0){
-			validPracticeRun = true; 
-			log::info("valid practice run []");
-		}
+		validPracticeRun = validPracticeRun 
+			|| (m_isPracticeMode && m_checkpointArray->count() == 0);
 		PlayLayer::resetLevel();
 	}
 
-/*
-	void resetLevelFromStart(){
-		validPracticeRun = !m_isPracticeMode?
-		PlayLayer::resetLevelFromStart();
-	}
-	*/
 
 	void onQuit(){
 		attemptTime += this->m_attemptTime;
@@ -186,11 +184,10 @@ class $modify(PlayLayer){
 
 		if(practice){
 			data.p_attempts += practiceAttempts;
-			data.first_practice = data.first_practice == 0 ? bestPracticeRun : data.first_practice;
-			if(validPracticeRun){
-				data.best_practice = 
-				bestPracticeRun <= data.best_practice || data.best_practice == 0 ? 
-				bestPracticeRun : data.best_practice;
+			if(savePracticeData){
+				data.first_practice = data.first_practice == 0 ? bestPracticeRun : data.first_practice;
+				data.best_practice = bestPracticeRun <= data.best_practice || data.best_practice == 0 ? 
+					bestPracticeRun : data.best_practice;
 			}
 		}
 		attemptTime = 0;
