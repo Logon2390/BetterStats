@@ -10,5 +10,18 @@
 	"name": "BetterStats",
 	"version": "v1.0.0",
 	"developer": "Logon",
-	"description": ""
+	"description": "",
+	"tags": [
+		"interface", "gameplay", "utility", "enhancement"
+	],
+	"links": {
+		"source": "https://github.com/Logon2390/BetterStats"
+	},
+	"dependencies": [
+        {
+            "id": "geode.node-ids",
+            "version": ">=v1.13.1",
+            "importance": "required"
+        }
+    ]
 }
