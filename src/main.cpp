@@ -138,6 +138,7 @@ class $modify(PlayLayer){
 		bestPracticeRun = 0;
 		practice = m_isPracticeMode;
 		practice = false;
+		savePracticeData = false;
 		return true;
 	}
 

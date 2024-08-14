@@ -10,9 +10,9 @@
 	"name": "BetterStats",
 	"version": "v1.0.0",
 	"developer": "Logon",
-	"description": "",
+	"description": "Detailed Level Statistics.",
 	"tags": [
-		"interface", "gameplay", "utility", "enhancement"
+		"utility", "enhancement"
 	],
 	"links": {
 		"source": "https://github.com/Logon2390/BetterStats"
