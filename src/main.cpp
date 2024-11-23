@@ -5,7 +5,6 @@ using namespace geode::prelude;
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <matjson/stl_serialize.hpp>
 #include <matjson.hpp>
 #include <chrono>
 
@@ -17,31 +16,25 @@ struct LevelStats {
 	double time_played;
 };
 
-template<>
+template <>
 struct matjson::Serialize<LevelStats> {
-    static LevelStats from_json(const matjson::Value& value) {
-        return LevelStats {
-            .attempts = value["attempts"].as_int(),
-			.p_attempts = value["p_attempts"].as_int(),
-			.first_practice = value["first_practice"].as_int(),
-			.best_practice = value["best_practice"].as_int(),
-			.time_played = value["time_played"].as_double()
-        };
+    static geode::Result<LevelStats> fromJson(const matjson::Value& value) {
+        GEODE_UNWRAP_INTO(int attempts, value["attempts"].asInt());
+		GEODE_UNWRAP_INTO(int p_attempts, value["p_attempts"].asInt());
+		GEODE_UNWRAP_INTO(int first_practice, value["first_practice"].asInt());
+		GEODE_UNWRAP_INTO(int best_practice, value["best_practice"].asInt());
+		GEODE_UNWRAP_INTO(double time_played, value["time_played"].asDouble());
+		return geode::Ok(LevelStats { attempts, p_attempts, first_practice, best_practice, time_played });
     }
-
-    static matjson::Value to_json(LevelStats const& value) {
-        auto obj = matjson::Object();
-			obj["attempts"] = value.attempts;
-			obj["p_attempts"] = value.p_attempts;
-			obj["first_practice"] = value.first_practice;
-			obj["best_practice"] = value.best_practice;
-			obj["time_played"] = value.time_played;
-        return obj;
+    static matjson::Value toJson(const LevelStats& value) {
+        return matjson::makeObject({
+			{"attempts", value.attempts},
+			{"p_attempts", value.p_attempts},
+			{"first_practice", value.first_practice},
+			{"best_practice", value.best_practice},
+			{"time_played", value.time_played}
+        });
     }
-
-	static bool is_json(Value const& value) {
-		return value.is_object();
-	}
 };
 
 LevelStats data;
@@ -53,10 +46,11 @@ bool practice = false;
 bool validPracticeRun = false;
 bool savePracticeData = false;
 
+
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
+		log::info("MyLevelInfoLayer::init");
 		if (!LevelInfoLayer::init(level, challenge)) return false;
-
 		if(!Mod::get()->hasSavedValue(std::to_string(m_level->m_levelID))) {
 			data = Mod::get()->setSavedValue(
 				std::to_string(m_level->m_levelID), 
