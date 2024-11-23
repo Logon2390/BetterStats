@@ -2,7 +2,7 @@
 
 using namespace geode::prelude;
 
-#include "../Shared/LevelData.hpp"
+#include "../shared/LevelData.hpp"
 #include <Geode/modify/PlayLayer.hpp>
 
 double attemptTime = 0;
