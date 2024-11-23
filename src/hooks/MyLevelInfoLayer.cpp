@@ -2,50 +2,12 @@
 
 using namespace geode::prelude;
 
+#include "../Shared/LevelData.hpp"
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
-#include <Geode/modify/PlayLayer.hpp>
-#include <matjson.hpp>
 #include <chrono>
 
-struct LevelStats {
-	int attempts;
-	int p_attempts;
-	int first_practice;
-	int best_practice;
-	double time_played;
-};
-
-template <>
-struct matjson::Serialize<LevelStats> {
-    static geode::Result<LevelStats> fromJson(const matjson::Value& value) {
-        GEODE_UNWRAP_INTO(int attempts, value["attempts"].asInt());
-		GEODE_UNWRAP_INTO(int p_attempts, value["p_attempts"].asInt());
-		GEODE_UNWRAP_INTO(int first_practice, value["first_practice"].asInt());
-		GEODE_UNWRAP_INTO(int best_practice, value["best_practice"].asInt());
-		GEODE_UNWRAP_INTO(double time_played, value["time_played"].asDouble());
-		return geode::Ok(LevelStats { attempts, p_attempts, first_practice, best_practice, time_played });
-    }
-    static matjson::Value toJson(const LevelStats& value) {
-        return matjson::makeObject({
-			{"attempts", value.attempts},
-			{"p_attempts", value.p_attempts},
-			{"first_practice", value.first_practice},
-			{"best_practice", value.best_practice},
-			{"time_played", value.time_played}
-        });
-    }
-};
-
 LevelStats data;
-double attemptTime = 0;
-int practiceAttempts = 0;
-int currentPracticeRun = 0;
-int bestPracticeRun = 0;
-bool practice = false;
-bool validPracticeRun = false;
-bool savePracticeData = false;
-
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
@@ -90,7 +52,6 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 		std::chrono::minutes minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
 		duration -= minutes;
     	std::chrono::seconds secs = duration_cast<std::chrono::seconds>(duration);
-		
 		std::string title = std::string(m_level->m_levelName);
 
 		std::string infoText = "<cg>Total Attempts</c>: " + std::to_string(m_level->m_attempts) + "\n" 
@@ -122,73 +83,5 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 			flMenu->addChild(infoBtn);
 			layer->updateLayout();
 		}
-	}
-};
-
-class $modify(PlayLayer){
-	bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects){
-		if(!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-		practiceAttempts = 1;
-		bestPracticeRun = 0;
-		practice = m_isPracticeMode;
-		practice = false;
-		savePracticeData = false;
-		return true;
-	}
-
-
-	void levelComplete(){
-		if(m_isPracticeMode && validPracticeRun){
-			savePracticeData = true;
-			bestPracticeRun = currentPracticeRun <= bestPracticeRun || bestPracticeRun == 0 ? 
-				currentPracticeRun : bestPracticeRun;
-		}
-		PlayLayer::levelComplete();
-	}
-
-
-	void togglePracticeMode(bool practiceMode){
-		currentPracticeRun = 1;
-		practice = true;
-		validPracticeRun = !m_isPracticeMode && m_attemptTime <= 3;
-		PlayLayer::togglePracticeMode(practiceMode);
-	}
-
-
-	void updateAttempts(){
-		if(m_isPracticeMode) {
-			practiceAttempts++;
-			currentPracticeRun++;
-		}
-		PlayLayer::updateAttempts();
-	}
-
-
-	void resetLevel(){
-		attemptTime += this->m_attemptTime;
-		validPracticeRun = validPracticeRun 
-			|| (m_isPracticeMode && m_checkpointArray->count() == 0);
-		PlayLayer::resetLevel();
-	}
-
-
-	void onQuit(){
-		attemptTime += this->m_attemptTime;
-		data.attempts = m_level->m_attempts;
-		data.time_played += attemptTime;
-
-		if(practice){
-			data.p_attempts += practiceAttempts;
-			if(savePracticeData){
-				data.first_practice = data.first_practice == 0 ? bestPracticeRun : data.first_practice;
-				data.best_practice = bestPracticeRun <= data.best_practice || data.best_practice == 0 ? 
-					bestPracticeRun : data.best_practice;
-			}
-		}
-		attemptTime = 0;
-
-		Mod::get()->setSavedValue(std::to_string(m_level->m_levelID), data);
-		Mod::get()->saveData();
-		PlayLayer::onQuit();
 	}
 };

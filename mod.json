@@ -15,7 +15,8 @@
 		"utility", "enhancement"
 	],
 	"links": {
-		"source": "https://github.com/Logon2390/BetterStats"
+		"source": "https://github.com/Logon2390/BetterStats",
+		"homepage": "https://x.com/Logon_23"
 	},
 	"dependencies": [
         {
