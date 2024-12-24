@@ -3,6 +3,7 @@
 using namespace geode::prelude;
 
 #include "../shared/LevelData.hpp"
+#include "../utils/LevelData.cpp"
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
 #include <chrono>
@@ -11,22 +12,10 @@ LevelStats data;
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
-		log::info("MyLevelInfoLayer::init");
 		if (!LevelInfoLayer::init(level, challenge)) return false;
-		if(!Mod::get()->hasSavedValue(std::to_string(m_level->m_levelID))) {
-			data = Mod::get()->setSavedValue(
-				std::to_string(m_level->m_levelID), 
-				LevelStats { 
-					.attempts = m_level->m_attempts,
-					.p_attempts = 0, 
-					.first_practice = 0, 
-					.best_practice = 0, 
-					.time_played = 0 });
-					Mod::get()->saveData();
-		}else{
-			data = Mod::get()->getSavedValue<LevelStats>(std::to_string(m_level->m_levelID));
-		}
-
+		log::info("------------------------------init------------------------------");
+		data = loadData(level);
+		
 		auto myInfoBtn = CCMenuItemSpriteExtra::create(
 			CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
 			this,

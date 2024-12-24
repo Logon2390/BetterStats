@@ -23,6 +23,11 @@
             "id": "geode.node-ids",
             "version": ">=v1.13.1",
             "importance": "required"
+        },
+		{
+            "id": "cvolton.level-id-api",
+            "version": "v1.1.0",
+            "importance": "required"
         }
     ]
 }

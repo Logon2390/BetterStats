@@ -2,6 +2,7 @@
 
 using namespace geode::prelude;
 
+#include "../utils/LevelData.cpp"
 #include "../shared/LevelData.hpp"
 #include <Geode/modify/PlayLayer.hpp>
 
@@ -70,8 +71,7 @@ class $modify(PlayLayer){
 		}
 		attemptTime = 0;
 
-		Mod::get()->setSavedValue(std::to_string(m_level->m_levelID), data);
-		Mod::get()->saveData();
+		saveData(m_level, data);
 		PlayLayer::onQuit();
 	}
 };
