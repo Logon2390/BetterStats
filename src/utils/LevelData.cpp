@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <string>
 #include <iostream>
+#include <chrono>
 
 using namespace geode::prelude;
 
@@ -15,6 +16,29 @@ static LevelStats getBaseData()
         .first_practice = 0,
         .best_practice = 0,
         .time_played = 0};
+}
+
+static std::string dataText(GJGameLevel *level, LevelStats data)
+{
+    std::chrono::duration<double> duration(data.time_played);
+    std::chrono::hours hours = duration_cast<std::chrono::hours>(duration);
+    duration -= hours;
+    std::chrono::minutes minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
+    duration -= minutes;
+    std::chrono::seconds secs = duration_cast<std::chrono::seconds>(duration);
+
+    std::string infoText = "<cg>Total Attempts</c>: " + std::to_string(level->m_attempts) + "\n" 
+                        + "<cy>Normal Attempts</c>: " + std::to_string(level->m_attempts - data.p_attempts) + "\n" 
+                        + "<cc>Practice Attempts</c>: " + std::to_string(data.p_attempts) + "\n" 
+                        + "<cj>Jumps</c>: " + std::to_string(level->m_jumps) + "\n\n"
+
+                        + "<cl>First Practice Run</c>: " + std::to_string(data.first_practice) + "\n" 
+                        + "<cb>Best Practice Run</c>: " + std::to_string(data.best_practice) + "\n\n"
+
+                        + "<cp>Time Played</c>: " + (hours.count() == 0 ? "" : std::to_string(hours.count()) + "h ") 
+                        + (minutes.count() == 0 ? "" : std::to_string(minutes.count()) + "m ") 
+                        + std::to_string(secs.count()) + "s";
+    return infoText;
 }
 
 static std::string levelValue(GJGameLevel *level)
