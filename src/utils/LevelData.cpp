@@ -72,11 +72,12 @@ static LevelStats loadData(GJGameLevel *level)
 {
     if (!Mod::get()->hasSavedValue(levelValue(level)))
     {
-        if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID)))
+        if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID.value())))
         {
-            log::info("Removing old level data for level %d", level->m_levelID.value());
-            LevelStats data = Mod::get()->getSavedValue<LevelStats>(std::to_string(level->m_levelID));
-            return Mod::get()->setSavedValue(levelValue(level), data);
+            LevelStats data = Mod::get()->getSavedValue<LevelStats>(std::to_string(level->m_levelID.value()));
+            Mod::get()->setSavedValue(levelValue(level), data);
+            Mod::get()->saveData();
+            return data;
         }
         else
         {
