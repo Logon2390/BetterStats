@@ -25,30 +25,34 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 
 		myInfoBtn->setPosition(infoBtn->getPosition());
 		infoBtn->getParent()->addChild(myInfoBtn);
-		infoBtn->getParent()->removeChild(infoBtn);
-
-		myInfoBtn->setID("my-button"_spr);
+		infoBtn->setVisible(false);
 		return true;
 	}
 
 	void myoninfoBtn(CCObject*) {
 		std::string title = std::string(m_level->m_levelName);
-
-		FLAlertLayer::create(title.c_str(), dataText(m_level, data) , "OK")->show();
-		CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
+		FLAlertLayer::create(title.c_str(), dataText(m_level, data), "OK")->show();
 		
-		if (currentScene) 
-		{
-			auto fltLayer = currentScene->getChildByID("FLAlertLayer");
-			auto layer = fltLayer->getChildByID("main-layer");
-			auto flMenu = layer->getChildByID("main-menu");
-			auto infoBtn = CCMenuItemSpriteExtra::create(
-				CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-				this, menu_selector(LevelInfoLayer::onLevelInfo));
+		auto currentScene = CCDirector::sharedDirector()->getRunningScene();
+		if (!currentScene) return;
+		
+		auto fltLayer = currentScene->getChildByID("FLAlertLayer");
+		if (!fltLayer) return;
+		
+		auto layer = fltLayer->getChildByID("main-layer");
+		if (!layer) return;
+		
+		auto flMenu = layer->getChildByID("main-menu");
+		if (!flMenu) return;
+		
+		auto infoBtn = CCMenuItemSpriteExtra::create(
+			CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
+			this, 
+			menu_selector(LevelInfoLayer::onLevelInfo)
+		);
 
-			infoBtn->setPosition(ccp(125, -5));
-			flMenu->addChild(infoBtn);
-			layer->updateLayout();
-		}
+		infoBtn->setPosition(ccp(125, -5));
+		flMenu->addChild(infoBtn);
+		layer->updateLayout();
 	}
 };
