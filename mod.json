@@ -8,7 +8,7 @@
 	},
 	"id": "logon.betterstats",
 	"name": "BetterStats",
-	"version": "v1.0.2",
+	"version": "v1.1.0",
 	"developer": "Logon",
 	"description": "Detailed Level Statistics.",
 	"tags": [
@@ -22,6 +22,11 @@
         {
             "id": "geode.node-ids",
             "version": ">=v1.13.1",
+            "importance": "required"
+        },
+		{
+            "id": "cvolton.level-id-api",
+            "version": "v1.1.0",
             "importance": "required"
         }
     ]

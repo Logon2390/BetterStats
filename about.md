@@ -1,6 +1,6 @@
 # <cb>BetterStats</c>
 BetterStats enhances the level stats window by providing detailed and useful statistics, 
-allowing players to track their progress and performance in community levels.
+allowing players to track their progress and performance in every level.
 
 # <cg>Features</c>
 - Normal Mode Attempts.

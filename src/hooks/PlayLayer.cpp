@@ -2,6 +2,7 @@
 
 using namespace geode::prelude;
 
+#include "../utils/LevelData.cpp"
 #include "../shared/LevelData.hpp"
 #include <Geode/modify/PlayLayer.hpp>
 
@@ -12,32 +13,35 @@ int bestPracticeRun = 0;
 bool practice = false;
 bool validPracticeRun = false;
 bool savePracticeData = false;
+bool isPracticeMode = false;
 
 class $modify(PlayLayer){
 	bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects){
 		if(!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 		practiceAttempts = 1;
-		bestPracticeRun = 0;
+		bestPracticeRun = 1;
 		practice = m_isPracticeMode;
+		isPracticeMode = m_isPracticeMode;
 		practice = false;
 		savePracticeData = false;
 		return true;
 	}
 
 	void levelComplete(){
-		if(m_isPracticeMode && validPracticeRun){
+		if(isPracticeMode && validPracticeRun){
 			savePracticeData = true;
-			bestPracticeRun = currentPracticeRun <= bestPracticeRun || bestPracticeRun == 0 ? 
+			bestPracticeRun = bestPracticeRun == 1 || currentPracticeRun <= bestPracticeRun ? 
 				currentPracticeRun : bestPracticeRun;
 		}
 		PlayLayer::levelComplete();
 	}
 
-	void togglePracticeMode(bool practiceMode){
+	void togglePracticeMode(bool PracticeMode){
 		currentPracticeRun = 1;
 		practice = true;
+		isPracticeMode = !isPracticeMode;
 		validPracticeRun = !m_isPracticeMode && m_attemptTime <= 3;
-		PlayLayer::togglePracticeMode(practiceMode);
+		PlayLayer::togglePracticeMode(PracticeMode);
 	}
 
 	void updateAttempts(){
@@ -57,7 +61,7 @@ class $modify(PlayLayer){
 
 	void onQuit(){
 		attemptTime += this->m_attemptTime;
-		data.attempts = m_level->m_attempts;
+		data.attempts = m_level->m_attempts.value();
 		data.time_played += attemptTime;
 
 		if(practice){
@@ -70,8 +74,7 @@ class $modify(PlayLayer){
 		}
 		attemptTime = 0;
 
-		Mod::get()->setSavedValue(std::to_string(m_level->m_levelID), data);
-		Mod::get()->saveData();
+		saveData(m_level, data);
 		PlayLayer::onQuit();
 	}
 };
