@@ -2,7 +2,6 @@
 
 using namespace geode::prelude;
 
-#include "../utils/LevelData.cpp"
 #include "../shared/LevelData.hpp"
 #include <Geode/modify/PlayLayer.hpp>
 
