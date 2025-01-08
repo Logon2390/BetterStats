@@ -1,4 +1,4 @@
-# 1.1.0
+# 1.1.1
 - Added support for Main levels.
 - Added support for Editor levels.
 - Fixed negative normal attempts bug.

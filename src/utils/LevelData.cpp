@@ -8,7 +8,9 @@ using namespace geode::prelude;
 #include "../shared/LevelData.hpp"
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 
-static LevelStats getBaseData()
+LevelStats data;
+
+LevelStats getBaseData()
 {
     return LevelStats{
         .attempts = 0,
@@ -18,7 +20,7 @@ static LevelStats getBaseData()
         .time_played = 0};
 }
 
-static std::string dataText(GJGameLevel *level, LevelStats data)
+std::string dataText(GJGameLevel* const& level, LevelStats data)
 {
     std::chrono::duration<double> duration(data.time_played);
     std::chrono::hours hours = duration_cast<std::chrono::hours>(duration);
@@ -41,7 +43,7 @@ static std::string dataText(GJGameLevel *level, LevelStats data)
     return infoText;
 }
 
-static std::string levelValue(GJGameLevel *level)
+std::string levelValue(GJGameLevel* const& level)
 {
     std::string value = "";
 
@@ -68,8 +70,9 @@ static std::string levelValue(GJGameLevel *level)
     }
 }
 
-static LevelStats loadData(GJGameLevel *level)
+LevelStats loadData(GJGameLevel* const& level)
 {
+    if(level == nullptr) return getBaseData();
     if (!Mod::get()->hasSavedValue(levelValue(level)))
     {
         if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID.value())))
@@ -84,11 +87,10 @@ static LevelStats loadData(GJGameLevel *level)
             return Mod::get()->setSavedValue(levelValue(level), getBaseData());
         }
     }
-
     return Mod::get()->getSavedValue<LevelStats>(levelValue(level));
 }
 
-static void saveData(GJGameLevel *level, LevelStats data)
+void saveData(GJGameLevel* const& level, LevelStats data)
 {
     Mod::get()->setSavedValue(levelValue(level), data);
     Mod::get()->saveData();

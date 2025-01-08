@@ -4,7 +4,6 @@ using namespace geode::prelude;
 
 #include <Geode/modify/EditLevelLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
-#include "../utils/LevelData.cpp"
 #include "../shared/LevelData.hpp"
 
 class $modify(MyEditLevelLayer, EditLevelLayer){
@@ -19,9 +18,11 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
 
         auto infoBtn = this->getChildByIDRecursive("info-button");
 
-        myInfoBtn->setPosition(infoBtn->getPosition());
-        infoBtn->getParent()->addChild(myInfoBtn);
-        infoBtn->setVisible(false);
+        if(infoBtn != nullptr){
+            myInfoBtn->setPosition(infoBtn->getPosition());
+            infoBtn->getParent()->addChild(myInfoBtn);
+            infoBtn->setVisible(false);
+        }
         return true;
     }
 
@@ -32,7 +33,7 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
         std::string title = std::string(m_level->m_levelName);
 
         FLAlertLayer::create(title.c_str(), dataText(m_level, data), "OK")->show();
-        CCScene *currentScene = CCDirector::sharedDirector()->getRunningScene();
+        CCScene* const& currentScene = CCDirector::sharedDirector()->getRunningScene();
 
         if (currentScene)
         {
