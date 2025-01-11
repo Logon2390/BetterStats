@@ -17,10 +17,10 @@ typedef struct LevelData LevelStats;
 
 
 LevelStats getBaseData();
-LevelStats loadData(GJGameLevel* const& level);
-std::string dataText(GJGameLevel* const& level, LevelStats data);
-std::string levelValue(GJGameLevel* const& level);
-void saveData(GJGameLevel* const& level, LevelStats data);
+LevelStats loadData(GJGameLevel* level);
+std::string dataText(GJGameLevel* level, const LevelStats& data);
+std::string levelValue(GJGameLevel* level);
+void saveData(GJGameLevel* level, const LevelStats& data);
 
 template <>
 struct matjson::Serialize<LevelStats> {

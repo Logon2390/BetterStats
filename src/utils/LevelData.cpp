@@ -8,7 +8,13 @@ using namespace geode::prelude;
 #include "../shared/LevelData.hpp"
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 
-LevelStats data;
+LevelStats data = {
+    .attempts = 0,
+    .p_attempts = 0,
+    .first_practice = 0,
+    .best_practice = 0,
+    .time_played = 0
+};
 
 LevelStats getBaseData()
 {
@@ -20,19 +26,19 @@ LevelStats getBaseData()
         .time_played = 0};
 }
 
-std::string dataText(GJGameLevel* const& level, LevelStats data)
+std::string dataText(GJGameLevel* level, const LevelStats& data)
 {
     std::chrono::duration<double> duration(data.time_played);
-    std::chrono::hours hours = duration_cast<std::chrono::hours>(duration);
+    std::chrono::hours hours = std::chrono::duration_cast<std::chrono::hours>(duration);
     duration -= hours;
     std::chrono::minutes minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
     duration -= minutes;
-    std::chrono::seconds secs = duration_cast<std::chrono::seconds>(duration);
+    std::chrono::seconds secs = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
-    std::string infoText = "<cg>Total Attempts</c>: " + std::to_string(level->m_attempts) + "\n" 
-                        + "<cy>Normal Attempts</c>: " + std::to_string(level->m_attempts - data.p_attempts) + "\n" 
+    std::string infoText = "<cg>Total Attempts</c>: " + std::to_string(level->m_attempts.value()) + "\n" 
+                        + "<cy>Normal Attempts</c>: " + std::to_string(level->m_attempts.value() - data.p_attempts) + "\n" 
                         + "<cc>Practice Attempts</c>: " + std::to_string(data.p_attempts) + "\n" 
-                        + "<cj>Jumps</c>: " + std::to_string(level->m_jumps) + "\n\n"
+                        + "<cj>Jumps</c>: " + std::to_string(level->m_jumps.value()) + "\n\n"
 
                         + "<cl>First Practice Run</c>: " + std::to_string(data.first_practice) + "\n" 
                         + "<cb>Best Practice Run</c>: " + std::to_string(data.best_practice) + "\n\n"
@@ -43,7 +49,7 @@ std::string dataText(GJGameLevel* const& level, LevelStats data)
     return infoText;
 }
 
-std::string levelValue(GJGameLevel* const& level)
+std::string levelValue(GJGameLevel* level)
 {
     std::string value = "";
 
@@ -70,12 +76,12 @@ std::string levelValue(GJGameLevel* const& level)
     }
 }
 
-LevelStats loadData(GJGameLevel* const& level)
+LevelStats loadData(GJGameLevel* level)
 {
     if(level == nullptr) return getBaseData();
     if (!Mod::get()->hasSavedValue(levelValue(level)))
     {
-        if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID.value())))
+        if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID)))
         {
             LevelStats data = Mod::get()->getSavedValue<LevelStats>(std::to_string(level->m_levelID.value()));
             Mod::get()->setSavedValue(levelValue(level), data);
@@ -90,7 +96,7 @@ LevelStats loadData(GJGameLevel* const& level)
     return Mod::get()->getSavedValue<LevelStats>(levelValue(level));
 }
 
-void saveData(GJGameLevel* const& level, LevelStats data)
+void saveData(GJGameLevel* level, const LevelStats& data)
 {
     Mod::get()->setSavedValue(levelValue(level), data);
     Mod::get()->saveData();
