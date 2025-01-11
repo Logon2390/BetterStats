@@ -33,7 +33,7 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
         std::string title = std::string(m_level->m_levelName);
 
         FLAlertLayer::create(title.c_str(), dataText(m_level, data), "OK")->show();
-        CCScene* const& currentScene = CCDirector::sharedDirector()->getRunningScene();
+        CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
 
         if (currentScene)
         {

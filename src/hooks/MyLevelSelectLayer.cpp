@@ -33,21 +33,15 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
 
     virtual void updatePageWithObject(CCObject* object1, CCObject* object2) {
         LevelSelectLayer::updatePageWithObject(object1, object2);
-        GJGameLevel* const& level = static_cast<GJGameLevel*>(object2);
+        GJGameLevel*  level = static_cast<GJGameLevel*>(object2);
 
-        try 
-        {
-            levels[page] = level;
-            page = page == 3 ? 1 : page + 1;
-        } catch (const std::exception& e) {
-            log::error("Error updating level: {}", e.what());
-        }
+        levels.at(page) = level;
+        page = (page + 1) % levels.size();
     }
-
-    // ik this is awkward
+    
     void myoninfoBtn(CCObject *level)
     {
-        GJGameLevel* const& currentLevel = levels[1];
+        GJGameLevel* currentLevel = levels.at(1);
         
         if(currentLevel != nullptr)
         {
@@ -55,7 +49,7 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
 
             std::string title = std::string(currentLevel->m_levelName);
             FLAlertLayer::create(title.c_str(), dataText(currentLevel, data), "OK")->show();
-            CCScene* const& currentScene = CCDirector::sharedDirector()->getRunningScene();
+            CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
 
             if (currentScene)
             {
