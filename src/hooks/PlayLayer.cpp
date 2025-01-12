@@ -64,11 +64,11 @@ class $modify(PlayLayer){
 		data.time_played += attemptTime;
 
 		if(practice){
-			data.p_attempts += practiceAttempts;
+			data.practice_stats.attempts += practiceAttempts;
 			if(savePracticeData){
-				data.first_practice = data.first_practice == 0 ? bestPracticeRun : data.first_practice;
-				data.best_practice = bestPracticeRun <= data.best_practice || data.best_practice == 0 ? 
-					bestPracticeRun : data.best_practice;
+				data.practice_stats.first_practice.attempts = data.practice_stats.first_practice.attempts == 0 ? bestPracticeRun : data.practice_stats.first_practice.attempts;
+				data.practice_stats.best_practice.attempts = bestPracticeRun <= data.practice_stats.best_practice.attempts || data.practice_stats.best_practice.attempts == 0 ? 
+					bestPracticeRun : data.practice_stats.best_practice.attempts;
 			}
 		}
 		attemptTime = 0;

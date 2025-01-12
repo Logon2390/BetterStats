@@ -8,22 +8,40 @@ using namespace geode::prelude;
 #include "../shared/LevelData.hpp"
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 
-LevelStats data = {
+PracticeRunStats praticeData = {
     .attempts = 0,
-    .p_attempts = 0,
-    .first_practice = 0,
-    .best_practice = 0,
+    .checkpoints = 0,
     .time_played = 0
 };
 
-LevelStats getBaseData()
-{
+PracticeStats practiceStats = {
+    .attempts = 0,
+    .practice_count = 0,
+    .time_played = 0,
+    .last_practice_date = "",
+    .first_practice = praticeData,
+    .best_practice = praticeData,
+    .last_practice = praticeData
+};
+
+LevelStats data = {
+    .attempts = 0,
+    .completed_date = "",
+    .download_date = "",
+    .last_play_date = "",
+    .practice_stats = practiceStats,
+    .time_played = 0
+};
+
+LevelStats getBaseData(){
     return LevelStats{
-        .attempts = 0,
-        .p_attempts = 0,
-        .first_practice = 0,
-        .best_practice = 0,
-        .time_played = 0};
+    .attempts = 0,
+    .completed_date = "",
+    .download_date = "",
+    .last_play_date = "",
+    .practice_stats = practiceStats,
+    .time_played = 0
+    };
 }
 
 std::string dataText(GJGameLevel* level, const LevelStats& data)
@@ -36,12 +54,12 @@ std::string dataText(GJGameLevel* level, const LevelStats& data)
     std::chrono::seconds secs = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
     std::string infoText = "<cg>Total Attempts</c>: " + std::to_string(level->m_attempts.value()) + "\n" 
-                        + "<cy>Normal Attempts</c>: " + std::to_string(level->m_attempts.value() - data.p_attempts) + "\n" 
-                        + "<cc>Practice Attempts</c>: " + std::to_string(data.p_attempts) + "\n" 
+                        + "<cy>Normal Attempts</c>: " + std::to_string(level->m_attempts.value() - data.practice_stats.attempts) + "\n" 
+                        + "<cc>Practice Attempts</c>: " + std::to_string(data.practice_stats.attempts) + "\n" 
                         + "<cj>Jumps</c>: " + std::to_string(level->m_jumps.value()) + "\n\n"
 
-                        + "<cl>First Practice Run</c>: " + std::to_string(data.first_practice) + "\n" 
-                        + "<cb>Best Practice Run</c>: " + std::to_string(data.best_practice) + "\n\n"
+                        + "<cl>First Practice Run</c>: " + std::to_string(data.practice_stats.first_practice.attempts) + "\n" 
+                        + "<cb>Best Practice Run</c>: " + std::to_string(data.practice_stats.best_practice.attempts) + "\n\n"
 
                         + "<cp>Time Played</c>: " + (hours.count() == 0 ? "" : std::to_string(hours.count()) + "h ") 
                         + (minutes.count() == 0 ? "" : std::to_string(minutes.count()) + "m ") 
