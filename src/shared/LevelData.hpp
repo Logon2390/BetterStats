@@ -3,8 +3,17 @@
 #include <Geode/Geode.hpp>
 #include <matjson.hpp>
 #include <matjson/stl_serialize.hpp>
+#include <fmt/format.h>
 
 using namespace geode::prelude;
+
+struct LegacyData {
+    int p_attempts;
+    int first_practice;
+    int best_practice;
+    double time_played;
+};
+typedef struct LegacyData LegacyStats;
 
 struct PracticeRun {
     int attempts;
@@ -34,12 +43,16 @@ struct LevelData {
 };
 typedef struct LevelData LevelStats;
 
+extern LevelStats data;
+extern LegacyStats legacy_data;
+extern bool load_legacy_data;
 
 LevelStats getBaseData();
 LevelStats loadData(GJGameLevel* level);
 std::string dataText(GJGameLevel* level, const LevelStats& data);
 std::string levelValue(GJGameLevel* level);
 void saveData(GJGameLevel* level, const LevelStats& data);
+void loadLegacyData(LevelStats& data);
 
 template <>
 struct matjson::Serialize<PracticeRunStats> {
@@ -91,6 +104,15 @@ template <>
 struct matjson::Serialize<LevelStats> {
     static geode::Result<LevelStats> fromJson(const matjson::Value& value) {
         LevelStats data;
+
+        if(value.contains("p_attempts")){
+            GEODE_UNWRAP_INTO(legacy_data.p_attempts, value["p_attempts"].asInt());
+            GEODE_UNWRAP_INTO(legacy_data.first_practice, value["first_practice"].asInt());
+            GEODE_UNWRAP_INTO(legacy_data.best_practice, value["best_practice"].asInt());
+            GEODE_UNWRAP_INTO(legacy_data.time_played, value["time_played"].asDouble());
+            load_legacy_data = true;
+        }
+
         GEODE_UNWRAP_INTO(data.attempts, value["attempts"].asInt());
         GEODE_UNWRAP_INTO(data.completed_date, value["completed_date"].asString());
         GEODE_UNWRAP_INTO(data.download_date, value["download_date"].asString());
@@ -99,8 +121,7 @@ struct matjson::Serialize<LevelStats> {
         GEODE_UNWRAP_INTO(data.time_played, value["time_played"].asDouble());
         return geode::Ok(data);
     }
-
-        
+    
     static matjson::Value toJson(const LevelStats& value) {
         return matjson::makeObject({
             {"attempts", value.attempts},
@@ -113,5 +134,4 @@ struct matjson::Serialize<LevelStats> {
     }
 };
 
-extern LevelStats data;
 

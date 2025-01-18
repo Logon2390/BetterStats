@@ -8,6 +8,15 @@ using namespace geode::prelude;
 #include "../shared/LevelData.hpp"
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 
+bool load_legacy_data = false;
+
+LegacyStats legacy_data = {
+    .p_attempts = 0,
+    .first_practice = 0,
+    .best_practice = 0,
+    .time_played = 0
+};
+
 PracticeRunStats praticeData = {
     .attempts = 0,
     .checkpoints = 0,
@@ -35,12 +44,12 @@ LevelStats data = {
 
 LevelStats getBaseData(){
     return LevelStats{
-    .attempts = 0,
-    .completed_date = "",
-    .download_date = "",
-    .last_play_date = "",
-    .practice_stats = practiceStats,
-    .time_played = 0
+        .attempts = 0,
+        .completed_date = "",
+        .download_date = "",
+        .last_play_date = "",
+        .practice_stats = practiceStats,
+        .time_played = 0
     };
 }
 
@@ -94,6 +103,15 @@ std::string levelValue(GJGameLevel* level)
     }
 }
 
+void loadLegacyData(LevelStats& data)
+{
+    data.practice_stats.attempts = legacy_data.p_attempts;
+    data.practice_stats.first_practice.attempts = legacy_data.first_practice;
+    data.practice_stats.best_practice.attempts = legacy_data.best_practice;
+    data.time_played = legacy_data.time_played;
+    load_legacy_data = false;
+}
+
 LevelStats loadData(GJGameLevel* level)
 {
     if(level == nullptr) return getBaseData();
@@ -102,6 +120,8 @@ LevelStats loadData(GJGameLevel* level)
         if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID)))
         {
             LevelStats data = Mod::get()->getSavedValue<LevelStats>(std::to_string(level->m_levelID.value()));
+            if (load_legacy_data) loadLegacyData(data);
+
             Mod::get()->setSavedValue(levelValue(level), data);
             Mod::get()->saveData();
             return data;
@@ -111,7 +131,10 @@ LevelStats loadData(GJGameLevel* level)
             return Mod::get()->setSavedValue(levelValue(level), getBaseData());
         }
     }
-    return Mod::get()->getSavedValue<LevelStats>(levelValue(level));
+
+    LevelStats data = Mod::get()->getSavedValue<LevelStats>(levelValue(level));
+    if (load_legacy_data) loadLegacyData(data);
+    return data;
 }
 
 void saveData(GJGameLevel* level, const LevelStats& data)
