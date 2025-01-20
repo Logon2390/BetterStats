@@ -5,7 +5,6 @@ using namespace geode::prelude;
 #include "../shared/LevelData.hpp"
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
-#include <Geode/ui/BasedButtonSprite.hpp>
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
