@@ -5,24 +5,24 @@ using namespace geode::prelude;
 #include "../shared/LevelData.hpp"
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
+#include <Geode/ui/BasedButtonSprite.hpp>
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
 		if (!LevelInfoLayer::init(level, challenge)) return false;
 		data = loadData(level);
 		
-		auto myInfoBtn = CCMenuItemSpriteExtra::create(
-			CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-			this,
-			menu_selector(MyLevelInfoLayer::myoninfoBtn)
-		);
+		auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
+		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelInfoLayer::myoninfoBtn));
+		statsBtn->setID("stats-button"_spr);
 
 		auto menu = this->getChildByID("other-menu");
 		if(menu != nullptr){
 			auto infoBtn = menu->getChildByID("info-button");
-			myInfoBtn->setPosition(infoBtn->getPosition());
-			infoBtn->getParent()->addChild(myInfoBtn);
+			statsBtn->setPosition(infoBtn->getPosition());
+			infoBtn->getParent()->addChild(statsBtn);
 			infoBtn->setVisible(false);
+			menu->updateLayout();
 		}
 
 		return true;

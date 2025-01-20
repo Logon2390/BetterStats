@@ -11,6 +11,13 @@
 	"version": "v1.1.2",
 	"developer": "Logon",
 	"description": "Detailed Level Statistics.",
+	"resources": {
+		"spritesheets": {
+			"UISheet": [
+				"resources/*.png"
+			]
+		}
+	},
 	"tags": [
 		"utility", "enhancement"
 	],
@@ -18,16 +25,14 @@
 		"source": "https://github.com/Logon2390/BetterStats",
 		"homepage": "https://x.com/Logon_23"
 	},
-	"dependencies": [
-        {
-            "id": "geode.node-ids",
-            "version": ">=v1.13.1",
-            "importance": "required"
-        },
-		{
-            "id": "cvolton.level-id-api",
-            "version": "v1.1.0",
-            "importance": "required"
-        }
-    ]
+	"dependencies": {
+		"geode.node-ids": {
+			"version": ">=v1.13.1",
+			"importance": "required"
+		},
+		"cvolton.level-id-api": {
+			"version": "v1.1.0",
+			"importance": "required"
+		}
+	}
 }

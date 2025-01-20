@@ -11,23 +11,20 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
         if (!EditLevelLayer::init(level)) return false;
         data = loadData(level);
 
-        auto myInfoBtn = CCMenuItemSpriteExtra::create(
-            CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-            this,
-            menu_selector(MyEditLevelLayer::myoninfoBtn));
+        auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
+		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyEditLevelLayer::myoninfoBtn));
+		statsBtn->setID("stats-button"_spr);
 
         auto infoBtn = this->getChildByIDRecursive("info-button");
-
         if(infoBtn != nullptr){
-            myInfoBtn->setPosition(infoBtn->getPosition());
-            infoBtn->getParent()->addChild(myInfoBtn);
+            statsBtn->setPosition(infoBtn->getPosition());
+            infoBtn->getParent()->addChild(statsBtn);
             infoBtn->setVisible(false);
         }
         return true;
     }
 
 
-    // ik this is awkward
     void myoninfoBtn(CCObject *)
     {
         std::string title = std::string(m_level->m_levelName);
