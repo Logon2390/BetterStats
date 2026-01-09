@@ -1,5 +1,5 @@
 {
-	"geode": "4.6.3",
+	"geode": "4.10.0",
 	"gd": {
 		"win": "2.2074",
 		"android": "2.2074",
@@ -22,8 +22,7 @@
 		"utility", "enhancement"
 	],
 	"links": {
-		"source": "https://github.com/Logon2390/BetterStats",
-		"homepage": "https://x.com/Logon_23"
+		"source": "https://github.com/Logon2390/BetterStats"
 	},
 	"dependencies": {
 		"geode.node-ids": {
