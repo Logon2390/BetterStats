@@ -90,7 +90,7 @@ std::string levelValue(GJGameLevel* level)
     {
         value += std::to_string(level->m_levelID.value());
 
-        if (level->m_levelType == GJLevelType::Local)
+        if (level->m_levelType == GJLevelType::Main)
             return value + "-local";
 
         if (level->m_dailyID > 0)

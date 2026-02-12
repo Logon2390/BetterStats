@@ -4,11 +4,14 @@
 
 using namespace geode::prelude;
 
-class MyPopup : public geode::Popup<GJGameLevel* const &, GJDifficultySprite* , LevelStats const &>
+class MyPopup : public geode::Popup
 {
 protected:
-    bool setup(GJGameLevel* const &level, GJDifficultySprite* difficultySprite, LevelStats const &data)
+    bool init(GJGameLevel* const &level, GJDifficultySprite* difficultySprite, LevelStats const &data)
     {
+        if (!Popup::init(440.f, 260.f))
+            return false;
+
         const char *cornerSpriteName = "rewardCorner_001.png";
         const char *accuracySpriteName = "pathIcon_09_001.png";
         const char* infoIconName = "GJ_infoIcon_001.png";
@@ -216,16 +219,16 @@ protected:
     }
 
 public:
-    static MyPopup *create(GJGameLevel* const &level, GJDifficultySprite* difficultySprite, LevelStats const &data)
+    static MyPopup* create(GJGameLevel* const &level, GJDifficultySprite* difficultySprite, LevelStats const &data)
     {
-        auto ret = new MyPopup();
-        if (ret->initAnchored(240.f, 260.f, level, difficultySprite, data))
+        auto popup = new MyPopup();
+        if (popup->init(level, difficultySprite, data))
         {
-            ret->autorelease();
-            return ret;
+            popup->autorelease();
+            return popup;
         }
 
-        delete ret;
+        delete popup;
         return nullptr;
     }
 };

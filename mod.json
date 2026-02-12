@@ -1,14 +1,14 @@
 {
-	"geode": "4.10.0",
+	"geode": "5.0.0-alpha.2",
 	"gd": {
-		"win": "2.2074",
-		"android": "2.2074",
-		"mac": "2.2074",
-		"ios": "2.2074"
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
 	},
 	"id": "logon.betterstats",
 	"name": "BetterStats",
-	"version": "v1.1.2",
+	"version": "v1.1.3",
 	"developer": "Logon",
 	"description": "Detailed Level Statistics.",
 	"resources": {
@@ -26,12 +26,12 @@
 	},
 	"dependencies": {
 		"geode.node-ids": {
-			"version": ">=v1.13.1",
-			"importance": "required"
+			"version": ">=v1.22.0-beta.2",
+			"required": true
 		},
 		"cvolton.level-id-api": {
-			"version": "v1.1.0",
-			"importance": "required"
+			"version": "v2.0.0-beta.2",
+			"required": true
 		}
 	}
 }

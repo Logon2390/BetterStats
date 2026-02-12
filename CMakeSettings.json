@@ -1,7 +1,7 @@
 ﻿{
   "configurations": [
     {
-      "name": "x64-Debug",
+      "name": "geode",
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
       "inheritEnvironments": [ "msvc_x64" ],
