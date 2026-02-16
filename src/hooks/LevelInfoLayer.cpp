@@ -10,9 +10,9 @@ using namespace geode::prelude;
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
 		if (!LevelInfoLayer::init(level, challenge)) return false;
-		data = loadData(level);
-		
-		auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("GJ_timeIcon_001.png"), CircleBaseColor::Blue, CircleBaseSize::Tiny);
+		levelStats = loadData(level);
+
+		auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelInfoLayer::myoninfoBtn));
 		statsBtn->setID("stats-button"_spr);
 
@@ -24,28 +24,11 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 			infoBtn->setVisible(false);
 			menu->updateLayout();
 		}
-
+ 
 		return true;
 	}
 
 	void myoninfoBtn(CCObject*) {
-		//std::string title = std::string(m_level->m_levelName);
-		MyPopup::create(m_level, m_difficultySprite, data)->show();
-		
-		/*
-		CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
-		if (currentScene){
-			auto fltLayer = currentScene->getChildByID("FLAlertLayer");
-            auto layer = fltLayer->getChildByID("main-layer");
-            auto flMenu = layer->getChildByID("main-menu");
-            auto infoBtn = CCMenuItemSpriteExtra::create(
-                CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-                this, menu_selector(LevelInfoLayer::onLevelInfo));
-
-            infoBtn->setPosition(ccp(125, -5));
-            flMenu->addChild(infoBtn);
-            layer->updateLayout();
-		}
-		*/
+		MyPopup::create(m_level, m_difficultySprite, levelStats)->show();
 	}
 };

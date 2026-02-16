@@ -2,8 +2,7 @@
 
 #include <Geode/Geode.hpp>
 #include <matjson.hpp>
-#include <matjson/stl_serialize.hpp>
-#include <fmt/format.h>
+#include <Geode/binding/GJGameLevel.hpp>
 
 using namespace geode::prelude;
 
@@ -34,7 +33,6 @@ struct PracticeData {
 typedef struct PracticeData PracticeStats;
 
 struct LevelData {
-    int attempts;
     std::string completed_date;
     std::string download_date;
     std::string last_play_date;
@@ -43,16 +41,15 @@ struct LevelData {
 };
 typedef struct LevelData LevelStats;
 
-extern LevelStats data;
-extern LegacyStats legacy_data;
-extern bool load_legacy_data;
-
+extern LevelStats levelStats;
 LevelStats getBaseData();
 LevelStats loadData(GJGameLevel* level);
+LevelStats saveData(GJGameLevel* level, const LevelStats& data);
+LevelStats loadLegacyData(GJGameLevel* level);
 std::string dataText(GJGameLevel* level, const LevelStats& data);
 std::string levelValue(GJGameLevel* level);
-void saveData(GJGameLevel* level, const LevelStats& data);
-void loadLegacyData(LevelStats& data);
+void mapLegacyData(const LegacyStats& data, LevelStats& outData);
+
 
 template <>
 struct matjson::Serialize<PracticeRunStats> {
@@ -104,16 +101,6 @@ template <>
 struct matjson::Serialize<LevelStats> {
     static geode::Result<LevelStats> fromJson(const matjson::Value& value) {
         LevelStats data;
-
-        if(value.contains("p_attempts")){
-            GEODE_UNWRAP_INTO(legacy_data.p_attempts, value["p_attempts"].asInt());
-            GEODE_UNWRAP_INTO(legacy_data.first_practice, value["first_practice"].asInt());
-            GEODE_UNWRAP_INTO(legacy_data.best_practice, value["best_practice"].asInt());
-            GEODE_UNWRAP_INTO(legacy_data.time_played, value["time_played"].asDouble());
-            load_legacy_data = true;
-        }
-
-        GEODE_UNWRAP_INTO(data.attempts, value["attempts"].asInt());
         GEODE_UNWRAP_INTO(data.completed_date, value["completed_date"].asString());
         GEODE_UNWRAP_INTO(data.download_date, value["download_date"].asString());
         GEODE_UNWRAP_INTO(data.last_play_date, value["last_play_date"].asString());
@@ -124,7 +111,6 @@ struct matjson::Serialize<LevelStats> {
     
     static matjson::Value toJson(const LevelStats& value) {
         return matjson::makeObject({
-            {"attempts", value.attempts},
             {"completed_date", value.completed_date},
             {"download_date", value.download_date},
             {"last_play_date", value.last_play_date},
@@ -135,3 +121,21 @@ struct matjson::Serialize<LevelStats> {
 };
 
 
+template <>
+struct matjson::Serialize<LegacyStats> {
+    static geode::Result<LegacyStats> fromJson(const matjson::Value& value) {
+        GEODE_UNWRAP_INTO(int p_attempts, value["p_attempts"].asInt());
+        GEODE_UNWRAP_INTO(int first_practice, value["first_practice"].asInt());
+        GEODE_UNWRAP_INTO(int best_practice, value["best_practice"].asInt());
+        GEODE_UNWRAP_INTO(double time_played, value["time_played"].asDouble());
+        return geode::Ok(LegacyStats{p_attempts, first_practice, best_practice, time_played });
+    }
+    static matjson::Value toJson(const LegacyStats& value) {
+        return matjson::makeObject({
+            {"p_attempts", value.p_attempts},
+            {"first_practice", value.first_practice},
+            {"best_practice", value.best_practice},
+            {"time_played", value.time_played}
+            });
+    }
+};

@@ -14,7 +14,7 @@ int page = 1;
 class $modify(MyLevelSelectLayer, LevelSelectLayer) {
     bool init(int page) {
         if (!LevelSelectLayer::init(page)) return false;
-        data = loadData(levels[2]);
+        levelStats = loadData(levels[2]);
 
         auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelSelectLayer::myoninfoBtn));
@@ -43,10 +43,10 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         
         if(currentLevel != nullptr)
         {
-            data = loadData(currentLevel);
+            levelStats = loadData(currentLevel);
 
             std::string title = std::string(currentLevel->m_levelName);
-            FLAlertLayer::create(title.c_str(), dataText(currentLevel, data), "OK")->show();
+            FLAlertLayer::create(title.c_str(), dataText(currentLevel, levelStats), "OK")->show();
             CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
 
             if (currentScene)

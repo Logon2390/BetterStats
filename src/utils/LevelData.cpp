@@ -1,21 +1,14 @@
 #include <Geode/Geode.hpp>
 #include <string>
-#include <iostream>
 #include <chrono>
+#include <filesystem>
 
 using namespace geode::prelude;
 
 #include "../shared/LevelData.hpp"
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
-
-bool load_legacy_data = false;
-
-LegacyStats legacy_data = {
-    .p_attempts = 0,
-    .first_practice = 0,
-    .best_practice = 0,
-    .time_played = 0
-};
+#include <Geode/utils/file.hpp>
+#include <matjson.hpp>
 
 PracticeRunStats praticeData = {
     .attempts = 0,
@@ -33,8 +26,7 @@ PracticeStats practiceStats = {
     .last_practice = praticeData
 };
 
-LevelStats data = {
-    .attempts = 0,
+LevelStats levelStats = {
     .completed_date = "",
     .download_date = "",
     .last_play_date = "",
@@ -44,7 +36,6 @@ LevelStats data = {
 
 LevelStats getBaseData(){
     return LevelStats{
-        .attempts = 0,
         .completed_date = "",
         .download_date = "",
         .last_play_date = "",
@@ -103,42 +94,70 @@ std::string levelValue(GJGameLevel* level)
     }
 }
 
-void loadLegacyData(LevelStats& data)
+void mapLegacyData(const LegacyStats& legacyLevel, LevelStats& outData)
 {
-    data.practice_stats.attempts = legacy_data.p_attempts;
-    data.practice_stats.first_practice.attempts = legacy_data.first_practice;
-    data.practice_stats.best_practice.attempts = legacy_data.best_practice;
-    data.time_played = legacy_data.time_played;
-    load_legacy_data = false;
+    outData.practice_stats.attempts = legacyLevel.p_attempts;
+    outData.practice_stats.first_practice.attempts = legacyLevel.first_practice;
+    outData.practice_stats.best_practice.attempts = legacyLevel.best_practice;
+    outData.time_played = legacyLevel.time_played;
 }
 
-LevelStats loadData(GJGameLevel* level)
+LevelStats loadLegacyData(GJGameLevel* level)
 {
-    if(level == nullptr) return getBaseData();
-    if (!Mod::get()->hasSavedValue(levelValue(level)))
-    {
-        if (Mod::get()->hasSavedValue(std::to_string(level->m_levelID)))
-        {
-            LevelStats data = Mod::get()->getSavedValue<LevelStats>(std::to_string(level->m_levelID.value()));
-            if (load_legacy_data) loadLegacyData(data);
+    if (!level) return getBaseData();
 
-            Mod::get()->setSavedValue(levelValue(level), data);
-            Mod::get()->saveData();
-            return data;
-        }
-        else
-        {
-            return Mod::get()->setSavedValue(levelValue(level), getBaseData());
-        }
+    auto keyDefault = std::to_string(level->m_levelID.value());
+    auto keyModern = levelValue(level);
+
+    LegacyStats legacyLevel{};
+    std::string key = Mod::get()->hasSavedValue(keyModern) ? keyModern : keyDefault;
+
+    if (!Mod::get()->hasSavedValue(key)) return getBaseData();
+
+    legacyLevel = Mod::get()->getSavedValue<LegacyStats>(key);
+    LevelStats result = getBaseData();
+    mapLegacyData(legacyLevel, result);
+
+    return result;
+}
+
+LevelStats loadData(GJGameLevel* level) 
+{
+    if (!level) return getBaseData();
+
+    std::string levelID = levelValue(level);
+    auto levelsDir = Mod::get()->getSaveDir() / "levels";
+    auto path = levelsDir / (levelID + ".json");
+
+    if (std::filesystem::exists(path)) 
+    {
+        auto content = file::readString(path);
+        if (!content) return getBaseData();
+
+        auto parsed = matjson::parse(content.unwrap());
+        if (!parsed) return getBaseData();
+
+        auto result = parsed.unwrap().as<LevelStats>();
+        return result.unwrap();
+    }
+    else
+    {
+        auto data = loadLegacyData(level);
+        return saveData(level, data);   
     }
 
-    LevelStats data = Mod::get()->getSavedValue<LevelStats>(levelValue(level));
-    if (load_legacy_data) loadLegacyData(data);
-    return data;
+	return getBaseData();
 }
 
-void saveData(GJGameLevel* level, const LevelStats& data)
-{
-    Mod::get()->setSavedValue(levelValue(level), data);
-    Mod::get()->saveData();
+
+LevelStats saveData(GJGameLevel* level, const LevelStats& data) {
+    std::string levelID = levelValue(level);
+
+    auto levelsDir = Mod::get()->getSaveDir() / "levels";
+    auto path = levelsDir / (levelID + ".json");
+
+    matjson::Value json = data;
+    auto result = file::writeString(path, json.dump());
+
+	return data;
 }

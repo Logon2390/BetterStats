@@ -9,8 +9,7 @@ class MyPopup : public geode::Popup
 protected:
     bool init(GJGameLevel* const &level, GJDifficultySprite* difficultySprite, LevelStats const &data)
     {
-        if (!Popup::init(440.f, 260.f))
-            return false;
+        if (!Popup::init(440.f, 260.f)) return false;
 
         const char *cornerSpriteName = "rewardCorner_001.png";
         const char *accuracySpriteName = "pathIcon_09_001.png";
@@ -83,7 +82,7 @@ protected:
         m_mainLayer->addChildAtPosition(difficulty, Anchor::TopRight, ccp(-200.0f, -40.0f));
         difficulty->setScale(0.9f);
 
-        CCLabelBMFont *timeLabel = CCLabelBMFont::create(("Time Played: " + std::to_string(data.time_played)).c_str(), bigFontName);
+        CCLabelBMFont *timeLabel = CCLabelBMFont::create(("Time Played: " + std::to_string(data.practice_stats.attempts)).c_str(), bigFontName);
         m_mainLayer->addChild(timeLabel);
         timeLabel->setScale(0.3f);
         timeLabel->setAnchorPoint(ccp(0, 0.5f));
@@ -137,11 +136,11 @@ protected:
         practiceMenu->setLayout(practiceStatsLayout);
 		
 
-        CCLabelBMFont *attemptsLabel = CCLabelBMFont::create(("Total Attempts: " + std::to_string(data.attempts)).c_str(), bigFontName);
+        CCLabelBMFont *attemptsLabel = CCLabelBMFont::create(("Total Attempts: " + std::to_string(level->m_attempts.value())).c_str(), bigFontName);
 		statsMenu->addChild(attemptsLabel);
         attemptsLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        const int normalAttempts = data.attempts - data.practice_stats.attempts;
+        const int normalAttempts = level->m_attempts.value() - data.practice_stats.attempts;
         CCLabelBMFont *normalLabel = CCLabelBMFont::create(("Normal Attempts: " + std::to_string(normalAttempts)).c_str(), bigFontName);
 		statsMenu->addChild(normalLabel);
         normalLabel->setAnchorPoint(ccp(0, 0.5f));

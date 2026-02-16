@@ -60,20 +60,19 @@ class $modify(PlayLayer){
 
 	void onQuit(){
 		attemptTime += this->m_attemptTime;
-		data.attempts = m_level->m_attempts.value();
-		data.time_played += attemptTime;
+		levelStats.time_played += attemptTime;
 
 		if(practice){
-			data.practice_stats.attempts += practiceAttempts;
+			levelStats.practice_stats.attempts += practiceAttempts;
 			if(savePracticeData){
-				data.practice_stats.first_practice.attempts = data.practice_stats.first_practice.attempts == 0 ? bestPracticeRun : data.practice_stats.first_practice.attempts;
-				data.practice_stats.best_practice.attempts = bestPracticeRun <= data.practice_stats.best_practice.attempts || data.practice_stats.best_practice.attempts == 0 ? 
-					bestPracticeRun : data.practice_stats.best_practice.attempts;
+				levelStats.practice_stats.first_practice.attempts = levelStats.practice_stats.first_practice.attempts == 0 ? bestPracticeRun : levelStats.practice_stats.first_practice.attempts;
+				levelStats.practice_stats.best_practice.attempts = bestPracticeRun <= levelStats.practice_stats.best_practice.attempts || levelStats.practice_stats.best_practice.attempts == 0 ?
+					bestPracticeRun : levelStats.practice_stats.best_practice.attempts;
 			}
 		}
 		attemptTime = 0;
 
-		saveData(m_level, data);
+		saveData(m_level, levelStats);
 		PlayLayer::onQuit();
 	}
 };

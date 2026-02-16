@@ -9,7 +9,7 @@ using namespace geode::prelude;
 class $modify(MyEditLevelLayer, EditLevelLayer){
     bool init(GJGameLevel * level){
         if (!EditLevelLayer::init(level)) return false;
-        data = loadData(level);
+        levelStats = loadData(level);
 
         auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyEditLevelLayer::myoninfoBtn));
@@ -29,7 +29,7 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
     {
         std::string title = std::string(m_level->m_levelName);
 
-        FLAlertLayer::create(title.c_str(), dataText(m_level, data), "OK")->show();
+        FLAlertLayer::create(title.c_str(), dataText(m_level, levelStats), "OK")->show();
         CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
 
         if (currentScene)
