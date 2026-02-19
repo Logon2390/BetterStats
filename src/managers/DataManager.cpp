@@ -59,7 +59,7 @@ LevelStats DataManager::save(GJGameLevel* level, const LevelStats& data) {
     auto path = dir / (key + ".json");
 
     matjson::Value json = data;
-    file::writeString(path, json.dump());
+    auto result = file::writeString(path, json.dump());
 
     return data;
 }

@@ -18,7 +18,7 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
         if (!EditLevelLayer::init(level)) return false;
         m_fields->levelStats = DataManager::load(level);
 
-        auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
+        auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyEditLevelLayer::onStatsPopup));
         statsBtn->setID("betterStats-button"_spr);
 		statsBtn->setPosition({ 30, 0 });

@@ -21,23 +21,21 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         if (!LevelSelectLayer::init(page)) return false;
         m_fields->levelStats = DataManager::load(m_fields->levels[2]);
 
-        auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
+        auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelSelectLayer::onStatsPopup));
 		statsBtn->setID("betterStats-button"_spr);
 		statsBtn->setPosition({ -30, 0 });
 
         auto menu = this->getChildByIDRecursive("info-menu");
         if(menu != nullptr) {
-            //statsBtn->setPosition(infoBtn->getPosition());
             menu->addChild(statsBtn);
-            //infoBtn->setVisible(false);
         }
         return true;
     }
 
     virtual void updatePageWithObject(CCObject* object1, CCObject* object2) {
         LevelSelectLayer::updatePageWithObject(object1, object2);
-        GJGameLevel*  level = static_cast<GJGameLevel*>(object2);
+        GJGameLevel* level = static_cast<GJGameLevel*>(object2);
 
         m_fields->levels.at(m_fields->page) = level;
         m_fields->page = (m_fields->page + 1) % m_fields->levels.size();

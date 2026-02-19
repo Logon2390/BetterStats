@@ -16,7 +16,7 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 		if (!LevelInfoLayer::init(level, challenge)) return false;
 		  m_fields->levelStats = DataManager::load(level);
 
-		auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("test.png"_spr), CircleBaseColor::Blue , CircleBaseSize::Tiny);
+		auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue , CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelInfoLayer::onStatsPopup));
 		statsBtn->setID("betterStats-button"_spr);
 		statsBtn->setPosition({ 30, 0 });
