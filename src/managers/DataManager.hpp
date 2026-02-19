@@ -1,55 +1,11 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <matjson.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
+#include <matjson.hpp>
+#include "StatsManager.hpp"
 
 using namespace geode::prelude;
-
-struct LegacyData {
-    int p_attempts;
-    int first_practice;
-    int best_practice;
-    double time_played;
-};
-typedef struct LegacyData LegacyStats;
-
-struct PracticeRun {
-    int attempts;
-    int checkpoints;
-    double time_played;
-};
-typedef struct PracticeRun PracticeRunStats;
-
-struct PracticeData {
-    int attempts;
-    int practice_count;
-    double time_played;
-    std::string last_practice_date;
-    PracticeRunStats first_practice;
-    PracticeRunStats best_practice;
-    PracticeRunStats last_practice;
-};
-typedef struct PracticeData PracticeStats;
-
-struct LevelData {
-    std::string completed_date;
-    std::string download_date;
-    std::string last_play_date;
-    PracticeStats practice_stats;
-    double time_played;
-};
-typedef struct LevelData LevelStats;
-
-extern LevelStats levelStats;
-LevelStats getBaseData();
-LevelStats loadData(GJGameLevel* level);
-LevelStats saveData(GJGameLevel* level, const LevelStats& data);
-LevelStats loadLegacyData(GJGameLevel* level);
-std::string dataText(GJGameLevel* level, const LevelStats& data);
-std::string levelValue(GJGameLevel* level);
-void mapLegacyData(const LegacyStats& data, LevelStats& outData);
-
 
 template <>
 struct matjson::Serialize<PracticeRunStats> {
@@ -66,7 +22,7 @@ struct matjson::Serialize<PracticeRunStats> {
             {"attempts", value.attempts},
             {"checkpoints", value.checkpoints},
             {"time_played", value.time_played}
-        });
+            });
     }
 };
 
@@ -93,7 +49,7 @@ struct matjson::Serialize<PracticeStats> {
             {"first_practice", value.first_practice},
             {"best_practice", value.best_practice},
             {"last_practice", value.last_practice}
-        });
+            });
     }
 };
 
@@ -101,25 +57,22 @@ template <>
 struct matjson::Serialize<LevelStats> {
     static geode::Result<LevelStats> fromJson(const matjson::Value& value) {
         LevelStats data;
-        GEODE_UNWRAP_INTO(data.completed_date, value["completed_date"].asString());
-        GEODE_UNWRAP_INTO(data.download_date, value["download_date"].asString());
-        GEODE_UNWRAP_INTO(data.last_play_date, value["last_play_date"].asString());
+        GEODE_UNWRAP_INTO(data.completed_date, value["completed_date"].as<int64_t>());
+        GEODE_UNWRAP_INTO(data.last_play_date, value["last_play_date"].as<int64_t>());
         GEODE_UNWRAP_INTO(data.practice_stats, value["practice_stats"].as<PracticeStats>());
         GEODE_UNWRAP_INTO(data.time_played, value["time_played"].asDouble());
         return geode::Ok(data);
     }
-    
+
     static matjson::Value toJson(const LevelStats& value) {
         return matjson::makeObject({
             {"completed_date", value.completed_date},
-            {"download_date", value.download_date},
             {"last_play_date", value.last_play_date},
             {"practice_stats", value.practice_stats},
             {"time_played", value.time_played}
-        });
+            });
     }
 };
-
 
 template <>
 struct matjson::Serialize<LegacyStats> {
@@ -128,8 +81,9 @@ struct matjson::Serialize<LegacyStats> {
         GEODE_UNWRAP_INTO(int first_practice, value["first_practice"].asInt());
         GEODE_UNWRAP_INTO(int best_practice, value["best_practice"].asInt());
         GEODE_UNWRAP_INTO(double time_played, value["time_played"].asDouble());
-        return geode::Ok(LegacyStats{p_attempts, first_practice, best_practice, time_played });
+        return geode::Ok(LegacyStats{ p_attempts, first_practice, best_practice, time_played });
     }
+
     static matjson::Value toJson(const LegacyStats& value) {
         return matjson::makeObject({
             {"p_attempts", value.p_attempts},
@@ -138,4 +92,14 @@ struct matjson::Serialize<LegacyStats> {
             {"time_played", value.time_played}
             });
     }
+};
+
+class DataManager {
+public:
+    static LevelStats load(GJGameLevel* level);
+    static LevelStats save(GJGameLevel* level, const LevelStats& data);
+
+private:
+    static LevelStats loadLegacy(GJGameLevel* level);
+    static std::string levelKey(GJGameLevel* level);
 };

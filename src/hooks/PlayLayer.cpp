@@ -2,77 +2,108 @@
 
 using namespace geode::prelude;
 
-#include "../shared/LevelData.hpp"
 #include <Geode/modify/PlayLayer.hpp>
-
-double attemptTime = 0;
-int practiceAttempts = 0;
-int currentPracticeRun = 0;
-int bestPracticeRun = 0;
-bool practice = false;
-bool validPracticeRun = false;
-bool savePracticeData = false;
-bool isPracticeMode = false;
+#include "../managers/DataManager.hpp"
+#include "../managers/StatsManager.hpp"
 
 class $modify(PlayLayer){
+
+	struct Fields {
+		LevelStats levelStats{};
+		PracticeRunStats bestPracticeRun{};
+		PracticeRunStats currentPracticeRun{};
+		double attemptTime = 0;
+		double practiceAttemptTime = 0;
+		int practiceAttempts = 1;
+		int practiceRunsCompleted = 0;
+		bool practice = false;
+		bool validPracticeRun = false;
+		bool savePracticeData = false;
+		bool isPracticeMode = false;
+	};
+
 	bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects){
 		if(!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-		practiceAttempts = 1;
-		bestPracticeRun = 1;
-		practice = m_isPracticeMode;
-		isPracticeMode = m_isPracticeMode;
-		practice = false;
-		savePracticeData = false;
+		m_fields->levelStats = DataManager::load(level);
+		m_fields->practice = m_isPracticeMode;
+		m_fields->isPracticeMode = m_isPracticeMode;
 		return true;
 	}
 
 	void levelComplete(){
-		if(isPracticeMode && validPracticeRun){
-			savePracticeData = true;
-			bestPracticeRun = bestPracticeRun == 1 || currentPracticeRun <= bestPracticeRun ? 
-				currentPracticeRun : bestPracticeRun;
+		if(m_fields->isPracticeMode && m_fields->validPracticeRun){
+			m_fields->savePracticeData = true;
+			m_fields->practiceRunsCompleted++;
+			m_fields->currentPracticeRun.time_played += m_fields->practiceAttemptTime;
+			m_fields->bestPracticeRun = m_fields->bestPracticeRun.attempts == 0  ? 
+				m_fields->currentPracticeRun : StatsManager::comparePracticeRuns(m_fields->currentPracticeRun, m_fields->bestPracticeRun);
 		}
+
+		if (!m_fields->isPracticeMode && m_fields->levelStats.completed_date == 0) {
+			m_fields->levelStats.completed_date = StatsManager::getCurrentDate();
+		}
+
+		if (m_fields->levelStats.practice_stats.first_practice.attempts == 0) {
+			m_fields->levelStats.practice_stats.first_practice = m_fields->currentPracticeRun;
+		}
+
 		PlayLayer::levelComplete();
 	}
 
 	void togglePracticeMode(bool PracticeMode){
-		currentPracticeRun = 1;
-		practice = true;
-		isPracticeMode = !isPracticeMode;
-		validPracticeRun = !m_isPracticeMode && m_attemptTime <= 3;
+		m_fields->currentPracticeRun = PracticeRunStats{1, 0, 0};
+		m_fields->practice = true;
+		m_fields->isPracticeMode = !m_fields->isPracticeMode;
+		m_fields->validPracticeRun = !m_isPracticeMode && m_attemptTime <= 3;
 		PlayLayer::togglePracticeMode(PracticeMode);
 	}
 
 	void updateAttempts(){
 		if(m_isPracticeMode) {
-			practiceAttempts++;
-			currentPracticeRun++;
+			m_fields->practiceAttempts++;
+			m_fields->currentPracticeRun.attempts++;
+			//m_fields->currentPracticeRun++;
 		}
 		PlayLayer::updateAttempts();
 	}
 
 	void resetLevel(){
-		attemptTime += this->m_attemptTime;
-		validPracticeRun = validPracticeRun 
+		m_fields->attemptTime += this->m_attemptTime;
+		m_fields->practiceAttemptTime += (m_fields->isPracticeMode) ? this->m_attemptTime : 0;
+		m_fields->validPracticeRun = m_fields->validPracticeRun
 			|| (m_isPracticeMode && m_checkpointArray->count() == 0);
 		PlayLayer::resetLevel();
 	}
 
-	void onQuit(){
-		attemptTime += this->m_attemptTime;
-		levelStats.time_played += attemptTime;
+	CheckpointObject* createCheckpoint(){
+		if (m_fields->isPracticeMode) {
+			m_fields->currentPracticeRun.checkpoints++;
+		}
 
-		if(practice){
-			levelStats.practice_stats.attempts += practiceAttempts;
-			if(savePracticeData){
-				levelStats.practice_stats.first_practice.attempts = levelStats.practice_stats.first_practice.attempts == 0 ? bestPracticeRun : levelStats.practice_stats.first_practice.attempts;
-				levelStats.practice_stats.best_practice.attempts = bestPracticeRun <= levelStats.practice_stats.best_practice.attempts || levelStats.practice_stats.best_practice.attempts == 0 ?
-					bestPracticeRun : levelStats.practice_stats.best_practice.attempts;
+		return PlayLayer::createCheckpoint();
+	}
+
+	void onQuit(){
+		auto levelStats = m_fields->levelStats;
+		m_fields->attemptTime += this->m_attemptTime;
+		m_fields->practiceAttemptTime += (m_fields->isPracticeMode) ? this->m_attemptTime : 0;
+		levelStats.time_played += m_fields->attemptTime;
+		levelStats.practice_stats.time_played += m_fields->practiceAttemptTime;
+		levelStats.last_play_date = StatsManager::getCurrentDate();
+
+		if(m_fields->practice){
+			levelStats.practice_stats.attempts += m_fields->practiceAttempts;
+			if(m_fields->savePracticeData){
+				levelStats.practice_stats.practice_count += m_fields->practiceRunsCompleted;
+				levelStats.practice_stats.last_practice = m_fields->currentPracticeRun;
+				levelStats.practice_stats.best_practice = levelStats.practice_stats.best_practice.attempts == 0 ? 
+					m_fields->bestPracticeRun : StatsManager::comparePracticeRuns(m_fields->bestPracticeRun, levelStats.practice_stats.best_practice);
 			}
 		}
-		attemptTime = 0;
+		m_fields->attemptTime = 0;
+		m_fields->practiceAttemptTime = 0;
 
-		saveData(m_level, levelStats);
+		DataManager::save(m_level, levelStats);
 		PlayLayer::onQuit();
 	}
 };

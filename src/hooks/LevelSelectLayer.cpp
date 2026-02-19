@@ -4,27 +4,33 @@ using namespace geode::prelude;
 
 #include <Geode/modify/LevelSelectLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
-#include "../shared/LevelData.hpp"
+#include "../managers/DataManager.hpp"
+#include "../managers/StatsManager.hpp"
+#include "../ui/StatsPopup.cpp"
 #include <array>
 
-
-std::array<GJGameLevel*, 3> levels = {nullptr, nullptr, nullptr};
-int page = 1;
-
 class $modify(MyLevelSelectLayer, LevelSelectLayer) {
+
+    struct Fields {
+        LevelStats levelStats{};
+        std::array<GJGameLevel*, 3> levels = { nullptr, nullptr, nullptr };
+        int page = 1;
+    };
+
     bool init(int page) {
         if (!LevelSelectLayer::init(page)) return false;
-        levelStats = loadData(levels[2]);
+        m_fields->levelStats = DataManager::load(m_fields->levels[2]);
 
         auto sprite = CircleButtonSprite::create(CCSprite::create("test.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
-		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelSelectLayer::myoninfoBtn));
-		statsBtn->setID("stats-button"_spr);
+		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelSelectLayer::onStatsPopup));
+		statsBtn->setID("betterStats-button"_spr);
+		statsBtn->setPosition({ -30, 0 });
 
-        auto infoBtn = this->getChildByIDRecursive("info-button");
-        if(infoBtn != nullptr) {
-            statsBtn->setPosition(infoBtn->getPosition());
-            infoBtn->getParent()->addChild(statsBtn);
-            infoBtn->setVisible(false);
+        auto menu = this->getChildByIDRecursive("info-menu");
+        if(menu != nullptr) {
+            //statsBtn->setPosition(infoBtn->getPosition());
+            menu->addChild(statsBtn);
+            //infoBtn->setVisible(false);
         }
         return true;
     }
@@ -33,35 +39,21 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         LevelSelectLayer::updatePageWithObject(object1, object2);
         GJGameLevel*  level = static_cast<GJGameLevel*>(object2);
 
-        levels.at(page) = level;
-        page = (page + 1) % levels.size();
+        m_fields->levels.at(m_fields->page) = level;
+        m_fields->page = (m_fields->page + 1) % m_fields->levels.size();
     }
     
-    void myoninfoBtn(CCObject *level)
+    void onStatsPopup(CCObject *level)
     {
-        GJGameLevel* currentLevel = levels.at(1);
+        GJGameLevel* currentLevel = m_fields->levels.at(1);
         
         if(currentLevel != nullptr)
         {
-            levelStats = loadData(currentLevel);
+            m_fields->levelStats = DataManager::load(currentLevel);
 
-            std::string title = std::string(currentLevel->m_levelName);
-            FLAlertLayer::create(title.c_str(), dataText(currentLevel, levelStats), "OK")->show();
-            CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
-
-            if (currentScene)
-            {
-                auto fltLayer = currentScene->getChildByID("FLAlertLayer");
-                auto layer = fltLayer->getChildByID("main-layer");
-                auto flMenu = layer->getChildByID("main-menu");
-                auto infoBtn = CCMenuItemSpriteExtra::create(
-                    CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-                    this, menu_selector(LevelSelectLayer::onInfo));
-
-                infoBtn->setPosition(ccp(125, -5));
-                flMenu->addChild(infoBtn);
-                layer->updateLayout();
-            }
+            int difficulty = static_cast<int>(currentLevel->m_difficulty);
+            auto dificultySprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
+            StatsPopup::create(currentLevel, dificultySprite, m_fields->levelStats)->show();
 
         }else{
             LevelSelectLayer::onInfo(level);
