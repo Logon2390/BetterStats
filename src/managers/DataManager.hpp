@@ -3,7 +3,9 @@
 #include <Geode/Geode.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
 #include <matjson.hpp>
+#include <array>
 #include "StatsManager.hpp"
+#include <Geode/Enums.hpp>
 
 using namespace geode::prelude;
 
@@ -61,6 +63,7 @@ struct matjson::Serialize<LevelStats> {
         GEODE_UNWRAP_INTO(data.last_play_date, value["last_play_date"].as<int64_t>());
         GEODE_UNWRAP_INTO(data.practice_stats, value["practice_stats"].as<PracticeStats>());
         GEODE_UNWRAP_INTO(data.time_played, value["time_played"].asDouble());
+		GEODE_UNWRAP_INTO(data.deathsPerPercent, value["deathsPerPercent"].as<std::array<int, 100>>());
         return geode::Ok(data);
     }
 
@@ -69,7 +72,8 @@ struct matjson::Serialize<LevelStats> {
             {"completed_date", value.completed_date},
             {"last_play_date", value.last_play_date},
             {"practice_stats", value.practice_stats},
-            {"time_played", value.time_played}
+            {"time_played", value.time_played},
+            { "deathsPerPercent", value.deathsPerPercent}
             });
     }
 };
@@ -89,17 +93,20 @@ struct matjson::Serialize<LegacyStats> {
             {"p_attempts", value.p_attempts},
             {"first_practice", value.first_practice},
             {"best_practice", value.best_practice},
-            {"time_played", value.time_played}
+            {"time_played", value.time_played},
             });
     }
 };
 
 class DataManager {
 public:
-    static LevelStats load(GJGameLevel* level);
-    static LevelStats save(GJGameLevel* level, const LevelStats& data);
+    static bool load(GJGameLevel* level);
+    static bool save();
 
 private:
-    static LevelStats loadLegacy(GJGameLevel* level);
+    static std::filesystem::path getSaveDir();
+	static std::filesystem::path levelFilePath;
+    static std::filesystem::path setLevelPath(const std::string& key);
+    static bool loadLegacy(GJGameLevel* level);
     static std::string levelKey(GJGameLevel* level);
 };

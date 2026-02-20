@@ -8,7 +8,7 @@ using namespace geode::prelude;
 class StatsPopup : public geode::Popup
 {
 protected:
-    bool init(GJGameLevel* const& level, GJDifficultySprite* difficultySprite, LevelStats const& data)
+    bool init(GJGameLevel* const& level, GJDifficultySprite* difficultySprite)
     {
         if (!Popup::init(440.f, 260.f)) return false;
 
@@ -63,27 +63,27 @@ protected:
         m_mainLayer->addChildAtPosition(difficulty, Anchor::TopLeft, ccp(40.0f, -45.0f));
         difficulty->setScale(0.9f);
 
-        CCLabelBMFont* timeLabel = CCLabelBMFont::create(("Time Played: " + StatsManager::getTimePlayed(data)).c_str(), bigFontName);
+        CCLabelBMFont* timeLabel = CCLabelBMFont::create(("Time Played: " + StatsManager::getTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(timeLabel);
         timeLabel->setScale(0.3f);
         timeLabel->setAnchorPoint(ccp(0, 0.5f));
         timeLabel->setPosition(ccp(67, 217));
 
-        CCLabelBMFont* practiceTimeLabel = CCLabelBMFont::create((" • "  + StatsManager::getPracticeTimePlayed(data)).c_str(), bigFontName);
+        CCLabelBMFont* practiceTimeLabel = CCLabelBMFont::create((" • "  + StatsManager::getPracticeTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(practiceTimeLabel);
         practiceTimeLabel->setScale(0.3f);
         practiceTimeLabel->setAnchorPoint(ccp(0, 0.5f));
         practiceTimeLabel->setColor({ 124, 255, 255 });
         practiceTimeLabel->setPosition(ccp((timeLabel->getPositionX() + timeLabel->getScaledContentWidth()), 217));
 
-        CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + StatsManager::getLastPlayed(data)).c_str(), bigFontName);
+        CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + StatsManager::getLastPlayed(level->m_isCompletionLegitimate)).c_str(), bigFontName);
 
         m_mainLayer->addChild(lastPlayedTimeLabel);
         lastPlayedTimeLabel->setScale(0.3f);
         lastPlayedTimeLabel->setAnchorPoint(ccp(0, 0.5f));
         lastPlayedTimeLabel->setPosition(ccp(67, 207));
 
-        CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + StatsManager::getCompleteDate(data)).c_str(), bigFontName);
+        CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + StatsManager::getCompleteDate(level->m_isCompletionLegitimate)).c_str(), bigFontName);
         m_mainLayer->addChild(completedLabel);
         completedLabel->setScale(0.3f);
         completedLabel->setAnchorPoint(ccp(0, 0.5f));
@@ -130,15 +130,15 @@ protected:
         statsMenu->addChild(attemptsLabel);
         attemptsLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        CCLabelBMFont* normalLabel = CCLabelBMFont::create(("Normal Attempts: " + std::to_string(StatsManager::getNormalAttempts(level, data))).c_str(), bigFontName);
+        CCLabelBMFont* normalLabel = CCLabelBMFont::create(("Normal Attempts: " + std::to_string(StatsManager::getNormalAttempts(level->m_attempts))).c_str(), bigFontName);
         statsMenu->addChild(normalLabel);
         normalLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        CCLabelBMFont* practiceLabel = CCLabelBMFont::create(("Practice Attempts: " + std::to_string(StatsManager::getPracticeAttempts(data))).c_str(), bigFontName);
+        CCLabelBMFont* practiceLabel = CCLabelBMFont::create(("Practice Attempts: " + std::to_string(StatsManager::getPracticeAttempts())).c_str(), bigFontName);
         statsMenu->addChild(practiceLabel);
         practiceLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        CCLabelBMFont* practiceRunsLabel = CCLabelBMFont::create(("Practice Runs: " + std::to_string(StatsManager::getPracticeRunsCount(data))).c_str(), bigFontName);
+        CCLabelBMFont* practiceRunsLabel = CCLabelBMFont::create(("Practice Runs: " + std::to_string(StatsManager::getPracticeRunsCount())).c_str(), bigFontName);
         practiceLabel->setAnchorPoint(ccp(0, 0.5f));
         statsMenu->addChild(practiceRunsLabel);
 
@@ -155,7 +155,7 @@ protected:
         bestPracticeSubtitle->setAnchorPoint(ccp(0, 0.5f));
         practiceMenu->addChild(bestPracticeSubtitle);
 
-		PracticeRunStats bestPracticeRun = StatsManager::getBestPractice(data);
+		PracticeRunStats bestPracticeRun = StatsManager::getBestPractice();
         CCLabelBMFont* bestPracticeAttemptsLabel = CCLabelBMFont::create((
             std::to_string(bestPracticeRun.attempts) + " / " +
             formatDuration(bestPracticeRun.time_played) + " / " +
@@ -169,7 +169,7 @@ protected:
 		firstPracticeSubtitle->setAnchorPoint(ccp(0, 0.5f));
         practiceMenu->addChild(firstPracticeSubtitle);
 
-		PracticeRunStats firstPracticeRun = StatsManager::getFirstPractice(data);
+		PracticeRunStats firstPracticeRun = StatsManager::getFirstPractice();
         CCLabelBMFont* firstPracticeAttemptsLabel = CCLabelBMFont::create((
             std::to_string(firstPracticeRun.attempts) + " / " +
             formatDuration(firstPracticeRun.time_played) + " / " +
@@ -183,7 +183,7 @@ protected:
 		lastPracticeSubtitle->setAnchorPoint(ccp(0, 0.5f));
         practiceMenu->addChild(lastPracticeSubtitle);
 
-        PracticeRunStats lastPracticeRun = StatsManager::getLastPractice(data);
+        PracticeRunStats lastPracticeRun = StatsManager::getLastPractice();
         CCLabelBMFont* lastPracticeAttemptsLabel = CCLabelBMFont::create((
             std::to_string(lastPracticeRun.attempts) + " / " +
             formatDuration(lastPracticeRun.time_played) + " / " +
@@ -222,10 +222,10 @@ protected:
     }
 
 public:
-    static StatsPopup* create(GJGameLevel* const& level, GJDifficultySprite* difficultySprite, LevelStats const& data)
+    static StatsPopup* create(GJGameLevel* const& level, GJDifficultySprite* difficultySprite)
     {
         auto popup = new StatsPopup();
-        if (popup->init(level, difficultySprite, data))
+        if (popup->init(level, difficultySprite))
         {
             popup->autorelease();
             return popup;

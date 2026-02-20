@@ -3,23 +3,19 @@
 using namespace geode::prelude;
 
 #include <Geode/modify/LevelSelectLayer.hpp>
-#include <Geode/modify/FLAlertLayer.hpp>
 #include "../managers/DataManager.hpp"
-#include "../managers/StatsManager.hpp"
 #include "../ui/StatsPopup.cpp"
 #include <array>
 
 class $modify(MyLevelSelectLayer, LevelSelectLayer) {
 
     struct Fields {
-        LevelStats levelStats{};
         std::array<GJGameLevel*, 3> levels = { nullptr, nullptr, nullptr };
         int page = 1;
     };
 
     bool init(int page) {
         if (!LevelSelectLayer::init(page)) return false;
-        m_fields->levelStats = DataManager::load(m_fields->levels[2]);
 
         auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelSelectLayer::onStatsPopup));
@@ -47,11 +43,11 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         
         if(currentLevel != nullptr)
         {
-            m_fields->levelStats = DataManager::load(currentLevel);
+            DataManager::load(currentLevel);
 
             int difficulty = static_cast<int>(currentLevel->m_difficulty);
             auto dificultySprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
-            StatsPopup::create(currentLevel, dificultySprite, m_fields->levelStats)->show();
+            StatsPopup::create(currentLevel, dificultySprite)->show();
 
         }else{
             LevelSelectLayer::onInfo(level);

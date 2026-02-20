@@ -4,8 +4,21 @@
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
 #include <Geode/Geode.hpp>
 #include <string>
+#include "StatsManager.hpp"
+#include <Geode/loader/Log.hpp>
 
 using namespace geode::prelude;
+
+std::filesystem::path DataManager::levelFilePath{};
+
+std::filesystem::path DataManager::getSaveDir() {
+    return Mod::get()->getSaveDir() / "levels";
+}
+
+std::filesystem::path DataManager::setLevelPath(const std::string& key) {
+    levelFilePath = getSaveDir() / (key + ".json");
+	return levelFilePath;
+}
 
 std::string DataManager::levelKey(GJGameLevel* level) {
     if (!level) return "";
@@ -27,46 +40,42 @@ std::string DataManager::levelKey(GJGameLevel* level) {
     return base + "-saved";
 }
 
-LevelStats DataManager::load(GJGameLevel* level) {
-    if (!level)
-        return StatsManager::getBaseData();
+bool DataManager::load(GJGameLevel* level) {
+    if (!level) return false;
 
-    auto key = levelKey(level);
-    auto path = Mod::get()->getSaveDir() / "levels" / (key + ".json");
+	auto path = setLevelPath(levelKey(level));
 
-    if (!std::filesystem::exists(path))
-        return loadLegacy(level);
+    if (!std::filesystem::exists(path)) {
+		bool found = loadLegacy(level);
+
+        if (!found) StatsManager::setLevelData({});
+        return true;       
+    }
 
     auto content = file::readString(path);
-    if (!content)
-        return StatsManager::getBaseData();
+    if (!content) return false;
 
     auto parsed = matjson::parse(content.unwrap());
-    if (!parsed)
-        return StatsManager::getBaseData();
+    if (!parsed) return false;
 
     auto result = parsed.unwrap().as<LevelStats>();
-    return result ? result.unwrap() : StatsManager::getBaseData();
+
+    if (result.isOk()) {
+        StatsManager::setLevelData(result.unwrap());
+        return true;
+    }
+
+    return false;
 }
 
-LevelStats DataManager::save(GJGameLevel* level, const LevelStats& data) {
-    if (!level) return data;
-
-    auto key = levelKey(level);
-    auto dir = Mod::get()->getSaveDir() / "levels";
-    std::filesystem::create_directories(dir);
-
-    auto path = dir / (key + ".json");
-
-    matjson::Value json = data;
-    auto result = file::writeString(path, json.dump());
-
-    return data;
+bool DataManager::save() {
+    matjson::Value json = StatsManager::getLevelData();
+    auto result = file::writeString(levelFilePath, json.dump());
+    return result.isOk();
 }
 
-LevelStats DataManager::loadLegacy(GJGameLevel* level) {
-    if (!level)
-        return StatsManager::getBaseData();
+bool DataManager::loadLegacy(GJGameLevel* level) {
+    if (!level) return false;
 
     auto keyModern = levelKey(level);
     auto keyDefault = std::to_string(level->m_levelID.value());
@@ -76,13 +85,9 @@ LevelStats DataManager::loadLegacy(GJGameLevel* level) {
         ? keyModern
         : keyDefault;
 
-    if (!Mod::get()->hasSavedValue(key))
-        return StatsManager::getBaseData();
+    if (!Mod::get()->hasSavedValue(key)) return false;
 
     auto legacy = Mod::get()->getSavedValue<LegacyStats>(key);
-
-    LevelStats result = StatsManager::getBaseData();
-    StatsManager::mapLegacyData(legacy, result);
-
-    return save(level, result);
+    StatsManager::mapLegacyData(legacy);
+    return true;
 }

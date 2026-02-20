@@ -3,42 +3,48 @@
 
 using namespace geode::prelude;
 
-LevelStats StatsManager::getBaseData() 
-{
-    return LevelStats{};
+LevelStats StatsManager::levelData{};
+
+LevelStats& StatsManager::setLevelData(const LevelStats& data) {
+    StatsManager::levelData = data;
+	return StatsManager::levelData;
 }
 
-void StatsManager::mapLegacyData(const LegacyStats& legacy, LevelStats& outData) 
-{
-    outData.practice_stats.attempts = legacy.p_attempts;
-    outData.practice_stats.first_practice.attempts = legacy.first_practice;
-    outData.practice_stats.best_practice.attempts = legacy.best_practice;
-    outData.time_played = legacy.time_played;
+LevelStats& StatsManager::getLevelData() {
+    return levelData;
 }
 
-int StatsManager::getNormalAttempts(GJGameLevel* level, const LevelStats& data)
+void StatsManager::mapLegacyData(const LegacyStats& legacy) 
 {
-	return level->m_attempts.value() - data.practice_stats.attempts;
+    levelData.practice_stats.attempts = legacy.p_attempts;
+    levelData.practice_stats.first_practice.attempts = legacy.first_practice;
+    levelData.practice_stats.best_practice.attempts = legacy.best_practice;
+    levelData.time_played = legacy.time_played;
 }
 
-int StatsManager::getPracticeAttempts(const LevelStats& data)
+int StatsManager::getNormalAttempts(const int attempts)
 {
-	return data.practice_stats.attempts;
+	return attempts - levelData.practice_stats.attempts;
 }
 
-std::string StatsManager::getTimePlayed(const LevelStats& data)
+int StatsManager::getPracticeAttempts()
 {
-	return formatDuration(data.time_played);
+	return levelData.practice_stats.attempts;
 }
 
-std::string StatsManager::getPracticeTimePlayed(const LevelStats& data)
+std::string StatsManager::getTimePlayed()
 {
-	return formatDuration(data.practice_stats.time_played);
+	return formatDuration(levelData.time_played);
 }
 
-int StatsManager::getPracticeRunsCount(const LevelStats& data)
+std::string StatsManager::getPracticeTimePlayed()
 {
-    return data.practice_stats.practice_count;
+	return formatDuration(levelData.practice_stats.time_played);
+}
+
+int StatsManager::getPracticeRunsCount()
+{
+    return levelData.practice_stats.practice_count;
 }
 
 int64_t StatsManager::getCurrentDate()
@@ -46,29 +52,35 @@ int64_t StatsManager::getCurrentDate()
 	return getCurrentTimestamp();
 }
 
-std::string StatsManager::getLastPlayed(const LevelStats& data)
+std::string StatsManager::getLastPlayed(const bool isLevelComplete)
 {
-	return data.last_play_date == 0 ? "unknow" : formatRelativeTime(data.last_play_date);
+	bool isDataUnavailable = levelData.last_play_date == 0;
+
+    if (!isLevelComplete && isDataUnavailable) return "-";
+	return isDataUnavailable ? "unknow" : formatRelativeTime(levelData.last_play_date);
 }
 
-std::string StatsManager::getCompleteDate(const LevelStats& data)
+std::string StatsManager::getCompleteDate(const bool isLevelComplete)
 {
-	return data.completed_date == 0 ? "unknow" : formatDate(data.completed_date);
+    bool isDataUnavailable = levelData.completed_date == 0;
+
+    if (!isLevelComplete && isDataUnavailable) return "-";
+	return  isDataUnavailable ? "unknow" : formatDate(levelData.completed_date);
 }
 
-PracticeRunStats StatsManager::getFirstPractice(const LevelStats& data)
+PracticeRunStats StatsManager::getFirstPractice()
 {
-	return data.practice_stats.first_practice;
+	return levelData.practice_stats.first_practice;
 }
 
-PracticeRunStats StatsManager::getBestPractice(const LevelStats& data)
+PracticeRunStats StatsManager::getBestPractice()
 {
-	return data.practice_stats.best_practice;
+	return levelData.practice_stats.best_practice;
 }
 
-PracticeRunStats StatsManager::getLastPractice(const LevelStats& data)
+PracticeRunStats StatsManager::getLastPractice()
 {
-	return data.practice_stats.last_practice;
+	return levelData.practice_stats.last_practice;
 }
 
 /* returns the better of the two runs, prioritizing attempts, then checkpoints, then time played */
@@ -81,4 +93,10 @@ PracticeRunStats StatsManager::comparePracticeRuns(const PracticeRunStats& run1,
         return (run1.checkpoints < run2.checkpoints) ? run1 : run2;
 
     return (run1.time_played < run2.time_played) ? run1 : run2;
+}
+
+void StatsManager::registerDeath(int percent) {
+    if (percent >= 0 && percent < 100) {
+        levelData.deathsPerPercent[percent]++;
+    }
 }
