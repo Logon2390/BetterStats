@@ -46,9 +46,8 @@ bool DataManager::load(GJGameLevel* level) {
 	auto path = setLevelPath(levelKey(level));
 
     if (!std::filesystem::exists(path)) {
-		bool found = loadLegacy(level);
-
-        if (!found) StatsManager::setLevelData({});
+		StatsManager::setLevelData({}); //reset loaded data to avoid showing wrong stats
+		loadLegacy(level); //try loading legacy data if exists, otherwise default data will be used
         return true;       
     }
 
