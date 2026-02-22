@@ -1,4 +1,5 @@
 #include "Formatters.hpp"
+#include "../managers/StatsManager.hpp"
 #include <chrono>
 
 #include <string>

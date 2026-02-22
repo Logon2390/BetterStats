@@ -2,6 +2,7 @@
 #include <Geode/binding/GJDifficultySprite.hpp>
 #include "../managers/StatsManager.hpp"
 #include "../utils/Formatters.hpp"
+#include "DeathsDistributionAlert.cpp"
 
 using namespace geode::prelude;
 
@@ -93,12 +94,6 @@ protected:
         CCMenu* practiceMenu = CCMenu::create();
 
         ColumnLayout* statsMenuLayout = ColumnLayout::create();
-        statsMenuLayout->setCrossAxisLineAlignment(AxisAlignment::Start);
-        statsMenuLayout->setAxisAlignment(AxisAlignment::End);
-        statsMenuLayout->setAxisReverse(true);
-        statsMenuLayout->setGap(10.f);
-
-        RowLayout* practiceMenuLayout = RowLayout::create();
         statsMenuLayout->setCrossAxisLineAlignment(AxisAlignment::Start);
         statsMenuLayout->setAxisAlignment(AxisAlignment::End);
         statsMenuLayout->setAxisReverse(true);
@@ -219,6 +214,10 @@ protected:
             "<cy>Attempts</c> / <cb>Time</c> / <cj>Checkpoints</c>";
 
         FLAlertLayer::create("Info", message, "OK")->show();
+    }
+
+    void onDeathsPerPercent(CCObject* node) {
+		DeathsDistributionAlert::create()->show();
     }
 
 public:

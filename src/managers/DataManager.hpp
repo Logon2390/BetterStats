@@ -5,7 +5,6 @@
 #include <matjson.hpp>
 #include <array>
 #include "StatsManager.hpp"
-#include <Geode/Enums.hpp>
 
 using namespace geode::prelude;
 

@@ -64,4 +64,5 @@ public:
 	static PracticeRunStats getLastPractice();
 	static PracticeRunStats comparePracticeRuns(const PracticeRunStats& run1, const PracticeRunStats& run2);
     static void registerDeath(int percent);
+    static int getMostDeadlyPercent();
 };

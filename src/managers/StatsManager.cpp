@@ -100,3 +100,17 @@ void StatsManager::registerDeath(int percent) {
         levelData.deathsPerPercent[percent]++;
     }
 }
+
+int StatsManager::getMostDeadlyPercent() {
+    int maxDeaths = 0;
+    int percent = 0;
+
+    for (int i = 0; i < 100; i++) {
+        if (levelData.deathsPerPercent[i] > maxDeaths) {
+            maxDeaths = levelData.deathsPerPercent[i];
+            percent = i;
+        }
+    }
+
+    return percent;
+}
