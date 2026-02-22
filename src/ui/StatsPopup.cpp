@@ -13,6 +13,7 @@ protected:
     {
         if (!Popup::init(440.f, 260.f)) return false;
 
+        const bool isLevelComplete = level->getNormalPercent() == 100;
         const char* cornerSpriteName = "rewardCorner_001.png";
         const char* accuracySpriteName = "pathIcon_09_001.png";
         const char* infoIconName = "GJ_infoIcon_001.png";
@@ -77,14 +78,14 @@ protected:
         practiceTimeLabel->setColor({ 124, 255, 255 });
         practiceTimeLabel->setPosition(ccp((timeLabel->getPositionX() + timeLabel->getScaledContentWidth()), 217));
 
-        CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + StatsManager::getLastPlayed(level->m_isCompletionLegitimate)).c_str(), bigFontName);
+        CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + StatsManager::getLastPlayed(isLevelComplete)).c_str(), bigFontName);
 
         m_mainLayer->addChild(lastPlayedTimeLabel);
         lastPlayedTimeLabel->setScale(0.3f);
         lastPlayedTimeLabel->setAnchorPoint(ccp(0, 0.5f));
         lastPlayedTimeLabel->setPosition(ccp(67, 207));
 
-        CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + StatsManager::getCompleteDate(level->m_isCompletionLegitimate)).c_str(), bigFontName);
+        CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + StatsManager::getCompleteDate(isLevelComplete)).c_str(), bigFontName);
         m_mainLayer->addChild(completedLabel);
         completedLabel->setScale(0.3f);
         completedLabel->setAnchorPoint(ccp(0, 0.5f));
