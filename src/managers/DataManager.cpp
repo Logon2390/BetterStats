@@ -42,13 +42,13 @@ std::string DataManager::levelKey(GJGameLevel* level) {
 
 bool DataManager::load(GJGameLevel* level) {
     if (!level) return false;
+	if (level->m_levelID.value() < 0) return false; //invalid level ID, likely not a real level
 
 	auto path = setLevelPath(levelKey(level));
 
     if (!std::filesystem::exists(path)) {
-		StatsManager::setLevelData({}); //reset loaded data to avoid showing wrong stats
-		loadLegacy(level); //try loading legacy data if exists, otherwise default data will be used
-        return true;       
+        StatsManager::setLevelData({}); //reset loaded data to avoid showing wrong stats
+        return loadLegacy(level); //try loading legacy data if exists, otherwise default data will be used
     }
 
     auto content = file::readString(path);

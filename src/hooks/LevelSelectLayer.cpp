@@ -4,6 +4,7 @@ using namespace geode::prelude;
 
 #include <Geode/modify/LevelSelectLayer.hpp>
 #include "../managers/DataManager.hpp"
+#include <Geode/binding/FLAlertLayer.hpp>
 #include "../ui/StatsPopup.cpp"
 #include <array>
 
@@ -43,14 +44,19 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         
         if(currentLevel != nullptr)
         {
-            DataManager::load(currentLevel);
+            bool load = DataManager::load(currentLevel);
 
-            int difficulty = static_cast<int>(currentLevel->m_difficulty);
-            auto dificultySprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
-            StatsPopup::create(currentLevel, dificultySprite)->show();
+            if (load) 
+            {
+                int difficulty = static_cast<int>(currentLevel->m_difficulty);
+                auto dificultySprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
+                StatsPopup::create(currentLevel, dificultySprite)->show();
+            }
+            else 
+            {
+				FLAlertLayer::create("?", "This is not a level. What were you expecting to see here ._. ?", "OK")->show();
 
-        }else{
-            LevelSelectLayer::onInfo(level);
+            }
         }
     }
 };
