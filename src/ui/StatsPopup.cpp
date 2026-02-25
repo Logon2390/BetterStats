@@ -2,7 +2,7 @@
 #include <Geode/binding/GJDifficultySprite.hpp>
 #include "../managers/StatsManager.hpp"
 #include "../utils/Formatters.hpp"
-#include "DeathsDistributionAlert.cpp"
+#include "DeathsDistributionChart.cpp"
 
 using namespace geode::prelude;
 
@@ -13,7 +13,6 @@ protected:
     {
         if (!Popup::init(440.f, 260.f)) return false;
 
-        const bool isLevelComplete = level->getNormalPercent() == 100;
         const char* cornerSpriteName = "rewardCorner_001.png";
         const char* accuracySpriteName = "pathIcon_09_001.png";
         const char* infoIconName = "GJ_infoIcon_001.png";
@@ -50,15 +49,13 @@ protected:
         completionBG->setZOrder(1);
         completionBG->setID("completionBG"_spr);
 
-        CCMenu* titleMenu = CCMenu::create();
-        m_mainLayer->addChild(titleMenu);
-        titleMenu->setLayout(RowLayout::create());
-        titleMenu->setPosition(ccp(350.0f, 393.0f));
+        CCScale9Sprite* chart = DeathsDistributionChart::create();
+        m_mainLayer->addChildAtPosition(chart, Anchor::Center, ccp(105.0f, -27.5f));
 
         CCLabelBMFont* titleLabel = CCLabelBMFont::create(std::string(level->m_levelName).c_str(), goldFontName);
-        titleMenu->addChild(titleLabel);
+		m_mainLayer->addChild(titleLabel);
+        titleLabel->setPosition(ccp(67.0f, 233.0f));
         titleLabel->setScale(0.7);
-
         titleLabel->setAnchorPoint(ccp(0, 0.5f));
 
         GJDifficultySprite* difficulty = new GJDifficultySprite(*difficultySprite);
@@ -78,67 +75,75 @@ protected:
         practiceTimeLabel->setColor({ 124, 255, 255 });
         practiceTimeLabel->setPosition(ccp((timeLabel->getPositionX() + timeLabel->getScaledContentWidth()), 217));
 
-        CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + StatsManager::getLastPlayed(isLevelComplete)).c_str(), bigFontName);
+        CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + 
+            StatsManager::getLastPlayed(StatsManager::isLevelComplete(level))).c_str(), bigFontName);
 
         m_mainLayer->addChild(lastPlayedTimeLabel);
         lastPlayedTimeLabel->setScale(0.3f);
         lastPlayedTimeLabel->setAnchorPoint(ccp(0, 0.5f));
         lastPlayedTimeLabel->setPosition(ccp(67, 207));
 
-        CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + StatsManager::getCompleteDate(isLevelComplete)).c_str(), bigFontName);
+        CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + 
+            StatsManager::getCompleteDate(StatsManager::isLevelComplete(level))).c_str(), bigFontName);
         m_mainLayer->addChild(completedLabel);
         completedLabel->setScale(0.3f);
         completedLabel->setAnchorPoint(ccp(0, 0.5f));
         completedLabel->setPosition(ccp(67, 197));
 
-        CCMenu* statsMenu = CCMenu::create();
-        CCMenu* practiceMenu = CCMenu::create();
+        CCNode* statsMenu = CCNode::create();
+        CCNode* practiceMenu = CCNode::create();
 
-        ColumnLayout* statsMenuLayout = ColumnLayout::create();
-        statsMenuLayout->setCrossAxisLineAlignment(AxisAlignment::Start);
-        statsMenuLayout->setAxisAlignment(AxisAlignment::End);
-        statsMenuLayout->setAxisReverse(true);
-        statsMenuLayout->setGap(5.f);
-
-        ColumnLayout* practiceStatsLayout = ColumnLayout::create();
-        practiceStatsLayout->setCrossAxisLineAlignment(AxisAlignment::Start);
-        practiceStatsLayout->setAxisAlignment(AxisAlignment::Even);
-        practiceStatsLayout->setAxisReverse(true);
-        practiceStatsLayout->setGap(5.f);
-
-        m_mainLayer->addChildAtPosition(statsMenu, Anchor::Center, ccp(-190, 10));
+        m_mainLayer->addChildAtPosition(statsMenu, Anchor::Center, ccp(-190, 15));
         m_mainLayer->addChildAtPosition(practiceMenu, Anchor::Center, ccp(-190, -70));
 
         statsMenu->setZOrder(2);
         statsMenu->setScale(0.35f);
         statsMenu->setContentSize(ccp(400, 220));
         statsMenu->setAnchorPoint(ccp(0, 0.5f));
-        statsMenu->setLayout(statsMenuLayout);
+        statsMenu->setLayout(ColumnLayout::create()
+            ->setCrossAxisLineAlignment(AxisAlignment::Start)
+            ->setAxisAlignment(AxisAlignment::Center)
+            ->setAxisReverse(true)
+            ->setGap(5.f));
 
         practiceMenu->setZOrder(2);
         practiceMenu->setScale(0.35f);
         practiceMenu->setContentSize(ccp(550, 200));
 		practiceMenu->setAnchorPoint(ccp(0, 0.5f));
-        practiceMenu->setLayout(practiceStatsLayout);
+        practiceMenu->setLayout(ColumnLayout::create()
+            ->setCrossAxisLineAlignment(AxisAlignment::Start)
+            ->setAxisAlignment(AxisAlignment::End)
+            ->setAxisReverse(true)
+            ->setGap(5.f));
 
 
-        CCLabelBMFont* attemptsLabel = CCLabelBMFont::create(("Total Attempts: " + std::to_string(level->m_attempts.value())).c_str(), bigFontName);
+        CCLabelBMFont* attemptsLabel = CCLabelBMFont::create(("Total Attempts: " + 
+            std::to_string(level->m_attempts.value())).c_str(), bigFontName);
+
         statsMenu->addChild(attemptsLabel);
         attemptsLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        CCLabelBMFont* normalLabel = CCLabelBMFont::create(("Normal Attempts: " + std::to_string(StatsManager::getNormalAttempts(level->m_attempts))).c_str(), bigFontName);
+        CCLabelBMFont* normalLabel = CCLabelBMFont::create(("Normal Attempts: " + 
+            std::to_string(StatsManager::getNormalAttempts(level->m_attempts))).c_str(), bigFontName);
+
         statsMenu->addChild(normalLabel);
         normalLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        CCLabelBMFont* practiceLabel = CCLabelBMFont::create(("Practice Attempts: " + std::to_string(StatsManager::getPracticeAttempts())).c_str(), bigFontName);
+        CCLabelBMFont* practiceLabel = CCLabelBMFont::create(("Practice Attempts: " +
+            std::to_string(StatsManager::getPracticeAttempts())).c_str(), bigFontName);
+
         statsMenu->addChild(practiceLabel);
         practiceLabel->setAnchorPoint(ccp(0, 0.5f));
 
-        CCLabelBMFont* practiceRunsLabel = CCLabelBMFont::create(("Practice Runs: " + std::to_string(StatsManager::getPracticeRunsCount())).c_str(), bigFontName);
+        CCLabelBMFont* practiceRunsLabel = CCLabelBMFont::create(("Practice Runs: " + 
+            std::to_string(StatsManager::getPracticeRunsCount())).c_str(), bigFontName);
+
         practiceLabel->setAnchorPoint(ccp(0, 0.5f));
         statsMenu->addChild(practiceRunsLabel);
 
-        CCLabelBMFont* jumpsLabel = CCLabelBMFont::create(("Jumps: " + std::to_string(level->m_jumps.value())).c_str(), bigFontName);
+        CCLabelBMFont* jumpsLabel = CCLabelBMFont::create(("Jumps: " + 
+            std::to_string(level->m_jumps.value())).c_str(), bigFontName);
+
         statsMenu->addChild(jumpsLabel);
         jumpsLabel->setAnchorPoint(ccp(0, 0.5f));
 
@@ -215,10 +220,6 @@ protected:
             "<cy>Attempts</c> / <cb>Time</c> / <cj>Checkpoints</c>";
 
         FLAlertLayer::create("Info", message, "OK")->show();
-    }
-
-    void onDeathsPerPercent(CCObject* node) {
-		DeathsDistributionAlert::create()->show();
     }
 
 public:

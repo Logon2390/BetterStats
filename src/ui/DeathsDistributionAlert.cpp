@@ -21,20 +21,20 @@ protected:
         const auto& arr = StatsManager::getLevelData().deathsPerPercent;
 
         CCLabelBMFont* bestPracticeSubtitle = CCLabelBMFont::create(("Most Deadly Percent: " + std::to_string(StatsManager::getMostDeadlyPercent())).c_str(), "chatFont.fnt");
-        CCMenu* mainMenu = CCMenu::create();
+        CCNode* mainMenu = CCNode::create();
         mainMenu->setContentSize({ 360.f, 220.f });
+		mainMenu->setAnchorPoint({ 0.5f, 0.5f });
         mainMenu->setZOrder(2);
         mainMenu->setPosition({
             m_mainLayer->getContentSize().width / 2,
            m_mainLayer->getContentSize().height / 2
             });
 
-        RowLayout* rowLayout = RowLayout::create();
-        rowLayout->setGap(35.f);
-        rowLayout->setAxisAlignment(AxisAlignment::Center);
-        rowLayout->setCrossAxisLineAlignment(AxisAlignment::Center);
-
-        mainMenu->setLayout(rowLayout);
+        mainMenu->setLayout(RowLayout::create()
+            ->setGap(35.f)
+            ->setAxisAlignment(AxisAlignment::Center)
+            ->setCrossAxisLineAlignment(AxisAlignment::Center)
+        );
 
         const int columns = 5;
         const int total = 100;
@@ -42,14 +42,15 @@ protected:
 
         for (int col = 0; col < columns; col++) {
 
-            CCMenu* columnMenu = CCMenu::create();
-            ColumnLayout* columnLayout = ColumnLayout::create();
-            columnLayout->setGap(4.f);
-            columnLayout->setAxisAlignment(AxisAlignment::Start);
-            columnLayout->setCrossAxisLineAlignment(AxisAlignment::Start);
-            columnLayout->setAxisReverse(true);
-
-            columnMenu->setLayout(columnLayout);
+            CCNode* columnMenu = CCNode::create();
+			columnMenu->setAnchorPoint({ 0.5f, 0.5f });
+			columnMenu->setContentSize({ 60.f, 300.f });
+            columnMenu->setLayout(ColumnLayout::create()
+                ->setGap(4.f)
+                ->setAxisAlignment(AxisAlignment::Start)
+                ->setCrossAxisLineAlignment(AxisAlignment::Start)
+                ->setAxisReverse(true)
+            );
 
             int start = col * perColumn;
             int end = start + perColumn;

@@ -114,3 +114,43 @@ int StatsManager::getMostDeadlyPercent() {
 
     return percent;
 }
+
+std::array<int, 10> StatsManager::getDeathsDistributionByRange() {
+    std::array<int, 10> distribution{};
+    distribution.fill(0);
+
+    for (int i = 0; i < 100; i++) {
+        int deaths = levelData.deathsPerPercent[i];
+        int index = i / 10;
+
+        distribution[index] += deaths;
+    }
+
+    return distribution;
+}
+
+std::array<float, 10> StatsManager::getNormalizedDeathsDistribution() {
+    auto distribution = StatsManager::getDeathsDistributionByRange();
+    std::array<float, 10> normalized{};
+
+    int maxDeaths = 0;
+    for (int value : distribution) {
+        if (value > maxDeaths) {
+            maxDeaths = value;
+        }
+    }
+
+    if (maxDeaths == 0) {
+        return normalized;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        normalized[i] = static_cast<float>(distribution[i]) / maxDeaths;
+    }
+
+    return normalized;
+}
+
+bool StatsManager::isLevelComplete(GJGameLevel* level) {
+    return level->getNormalPercent() == 100;
+}

@@ -65,4 +65,7 @@ public:
 	static PracticeRunStats comparePracticeRuns(const PracticeRunStats& run1, const PracticeRunStats& run2);
     static void registerDeath(int percent);
     static int getMostDeadlyPercent();
+    static std::array<int, 10> getDeathsDistributionByRange();
+    static std::array<float, 10> getNormalizedDeathsDistribution();
+	static bool isLevelComplete(GJGameLevel* level);
 };
