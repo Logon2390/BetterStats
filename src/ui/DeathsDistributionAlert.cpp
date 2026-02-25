@@ -77,8 +77,8 @@ protected:
         auto layer = m_mainLayer->getChildByID("scroll-layer");
         auto textArea = layer->getChildByIDRecursive("content-text-area");
         textArea->setPositionY(140.f);
-        textArea->addChildAtPosition(bestPracticeSubtitle, Anchor::Top, ccp(0, 85));
-        textArea->addChildAtPosition(mainMenu, Anchor::Center, ccp(0, 0));
+        textArea->addChildAtPosition(bestPracticeSubtitle, Anchor::Top, ccp(0.f, 85.f));
+        textArea->addChildAtPosition(mainMenu, Anchor::Center, ccp(0.f, 0.f));
 
         return true;
     }

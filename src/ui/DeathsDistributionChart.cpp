@@ -61,11 +61,11 @@ protected:
 		menu->updateLayout();
 
         this->addChildAtPosition(mainContainer, Anchor::Center);
-		this->addChildAtPosition(separator, Anchor::Bottom, ccp(0, 17));
+		this->addChildAtPosition(separator, Anchor::Bottom, ccp(0.f, 17.f));
 		this->addChildAtPosition(menu, Anchor::Top, ccp(0.f, -10.f));
 
 		int rangeStart = 0;
-		int DeathLabelY = 0.f;
+		float DeathLabelY = 0.f;
 
         for (int i = 0; i < 10; i++) {
             rangeStart = i * 10;

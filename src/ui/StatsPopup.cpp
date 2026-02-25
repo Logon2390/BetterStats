@@ -21,30 +21,30 @@ protected:
         const char* goldFontName = "goldFont.fnt";
 
         CCSprite* BottomLeftSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(BottomLeftSprite, Anchor::BottomLeft, ccp(25, 25));
+        m_mainLayer->addChildAtPosition(BottomLeftSprite, Anchor::BottomLeft, ccp(25.f, 25.f));
 
         CCSprite* cornerSprite2 = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(cornerSprite2, Anchor::TopLeft, ccp(25, -25));
+        m_mainLayer->addChildAtPosition(cornerSprite2, Anchor::TopLeft, ccp(25.f, -25.f));
         cornerSprite2->setRotation(90.f);
 
         CCSprite* cornerSprite3 = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(cornerSprite3, Anchor::BottomRight, ccp(-25, 25));
+        m_mainLayer->addChildAtPosition(cornerSprite3, Anchor::BottomRight, ccp(-25.f, 25.f));
         cornerSprite3->setRotation(270.f);
 
         CCSprite* cornerSprite4 = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(cornerSprite4, Anchor::TopRight, ccp(-25, -25));
+        m_mainLayer->addChildAtPosition(cornerSprite4, Anchor::TopRight, ccp(-25.f, -25.f));
         cornerSprite4->setRotation(180.f);
 
         CCScale9Sprite* practiceRunsBG = cocos2d::extension::CCScale9Sprite::create(backgroundName, { 0.0f, 0.0f, 80.0f, 80.0f });
-        m_mainLayer->addChildAtPosition(practiceRunsBG, Anchor::Center, ccp(-95, -70));
-        practiceRunsBG->setContentSize({ 200, 75 });
+        m_mainLayer->addChildAtPosition(practiceRunsBG, Anchor::Center, ccp(-95.f, -70.f));
+        practiceRunsBG->setContentSize({ 200.f, 75.f });
         practiceRunsBG->setColor({ 130, 64, 33 });
         practiceRunsBG->setZOrder(1);
         practiceRunsBG->setID("practiceRunsBG"_spr);
 
         CCScale9Sprite* completionBG = cocos2d::extension::CCScale9Sprite::create(backgroundName, { 0.0f, 0.0f, 80.0f, 80.0f });
-        m_mainLayer->addChildAtPosition(completionBG, Anchor::Center, ccp(-95, 15));
-        completionBG->setContentSize({ 200, 75 });
+        m_mainLayer->addChildAtPosition(completionBG, Anchor::Center, ccp(-95.f, 15.f));
+        completionBG->setContentSize({ 200.f, 75.f });
         completionBG->setColor({ 130, 64, 33 });
         completionBG->setZOrder(1);
         completionBG->setID("completionBG"_spr);
@@ -55,8 +55,8 @@ protected:
         CCLabelBMFont* titleLabel = CCLabelBMFont::create(std::string(level->m_levelName).c_str(), goldFontName);
 		m_mainLayer->addChild(titleLabel);
         titleLabel->setPosition(ccp(67.0f, 233.0f));
-        titleLabel->setScale(0.7);
-        titleLabel->setAnchorPoint(ccp(0, 0.5f));
+        titleLabel->setScale(0.7f);
+        titleLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         GJDifficultySprite* difficulty = new GJDifficultySprite(*difficultySprite);
         m_mainLayer->addChildAtPosition(difficulty, Anchor::TopLeft, ccp(40.0f, -45.0f));
@@ -65,13 +65,13 @@ protected:
         CCLabelBMFont* timeLabel = CCLabelBMFont::create(("Time Played: " + StatsManager::getTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(timeLabel);
         timeLabel->setScale(0.3f);
-        timeLabel->setAnchorPoint(ccp(0, 0.5f));
-        timeLabel->setPosition(ccp(67, 217));
+        timeLabel->setAnchorPoint(ccp(0.f, 0.5f));
+        timeLabel->setPosition(ccp(67.f, 217.f));
 
         CCLabelBMFont* practiceTimeLabel = CCLabelBMFont::create((" • "  + StatsManager::getPracticeTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(practiceTimeLabel);
         practiceTimeLabel->setScale(0.3f);
-        practiceTimeLabel->setAnchorPoint(ccp(0, 0.5f));
+        practiceTimeLabel->setAnchorPoint(ccp(0.f, 0.5f));
         practiceTimeLabel->setColor({ 124, 255, 255 });
         practiceTimeLabel->setPosition(ccp((timeLabel->getPositionX() + timeLabel->getScaledContentWidth()), 217));
 
@@ -80,26 +80,26 @@ protected:
 
         m_mainLayer->addChild(lastPlayedTimeLabel);
         lastPlayedTimeLabel->setScale(0.3f);
-        lastPlayedTimeLabel->setAnchorPoint(ccp(0, 0.5f));
-        lastPlayedTimeLabel->setPosition(ccp(67, 207));
+        lastPlayedTimeLabel->setAnchorPoint(ccp(0.f, 0.5f));
+        lastPlayedTimeLabel->setPosition(ccp(67.f, 207.f));
 
         CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + 
             StatsManager::getCompleteDate(StatsManager::isLevelComplete(level))).c_str(), bigFontName);
         m_mainLayer->addChild(completedLabel);
         completedLabel->setScale(0.3f);
-        completedLabel->setAnchorPoint(ccp(0, 0.5f));
-        completedLabel->setPosition(ccp(67, 197));
+        completedLabel->setAnchorPoint(ccp(0.f, 0.5f));
+        completedLabel->setPosition(ccp(67.f, 197.f));
 
         CCNode* statsMenu = CCNode::create();
         CCNode* practiceMenu = CCNode::create();
 
-        m_mainLayer->addChildAtPosition(statsMenu, Anchor::Center, ccp(-190, 15));
-        m_mainLayer->addChildAtPosition(practiceMenu, Anchor::Center, ccp(-190, -70));
+        m_mainLayer->addChildAtPosition(statsMenu, Anchor::Center, ccp(-190.f, 15.f));
+        m_mainLayer->addChildAtPosition(practiceMenu, Anchor::Center, ccp(-190.f, -70.f));
 
         statsMenu->setZOrder(2);
         statsMenu->setScale(0.35f);
-        statsMenu->setContentSize(ccp(400, 220));
-        statsMenu->setAnchorPoint(ccp(0, 0.5f));
+        statsMenu->setContentSize(ccp(400.f, 220.f));
+        statsMenu->setAnchorPoint(ccp(0.f, 0.5f));
         statsMenu->setLayout(ColumnLayout::create()
             ->setCrossAxisLineAlignment(AxisAlignment::Start)
             ->setAxisAlignment(AxisAlignment::Center)
@@ -108,8 +108,8 @@ protected:
 
         practiceMenu->setZOrder(2);
         practiceMenu->setScale(0.35f);
-        practiceMenu->setContentSize(ccp(550, 200));
-		practiceMenu->setAnchorPoint(ccp(0, 0.5f));
+        practiceMenu->setContentSize(ccp(550.f, 200.f));
+		practiceMenu->setAnchorPoint(ccp(0.f, 0.5f));
         practiceMenu->setLayout(ColumnLayout::create()
             ->setCrossAxisLineAlignment(AxisAlignment::Start)
             ->setAxisAlignment(AxisAlignment::End)
@@ -121,39 +121,39 @@ protected:
             std::to_string(level->m_attempts.value())).c_str(), bigFontName);
 
         statsMenu->addChild(attemptsLabel);
-        attemptsLabel->setAnchorPoint(ccp(0, 0.5f));
+        attemptsLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         CCLabelBMFont* normalLabel = CCLabelBMFont::create(("Normal Attempts: " + 
             std::to_string(StatsManager::getNormalAttempts(level->m_attempts))).c_str(), bigFontName);
 
         statsMenu->addChild(normalLabel);
-        normalLabel->setAnchorPoint(ccp(0, 0.5f));
+        normalLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         CCLabelBMFont* practiceLabel = CCLabelBMFont::create(("Practice Attempts: " +
             std::to_string(StatsManager::getPracticeAttempts())).c_str(), bigFontName);
 
         statsMenu->addChild(practiceLabel);
-        practiceLabel->setAnchorPoint(ccp(0, 0.5f));
+        practiceLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         CCLabelBMFont* practiceRunsLabel = CCLabelBMFont::create(("Practice Runs: " + 
             std::to_string(StatsManager::getPracticeRunsCount())).c_str(), bigFontName);
 
-        practiceLabel->setAnchorPoint(ccp(0, 0.5f));
+        practiceLabel->setAnchorPoint(ccp(0.f, 0.5f));
         statsMenu->addChild(practiceRunsLabel);
 
         CCLabelBMFont* jumpsLabel = CCLabelBMFont::create(("Jumps: " + 
             std::to_string(level->m_jumps.value())).c_str(), bigFontName);
 
         statsMenu->addChild(jumpsLabel);
-        jumpsLabel->setAnchorPoint(ccp(0, 0.5f));
+        jumpsLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         CCLabelBMFont* practiceTitle = CCLabelBMFont::create("Practice Runs", goldFontName);
-        m_mainLayer->addChildAtPosition(practiceTitle, Anchor::Center, ccp(-100, -30));
+        m_mainLayer->addChildAtPosition(practiceTitle, Anchor::Center, ccp(-100.f, -30.f));
         practiceTitle->setScale(0.4f);
         practiceTitle->setZOrder(2);
 
         CCLabelBMFont* bestPracticeSubtitle = CCLabelBMFont::create("Best", goldFontName);  
-        bestPracticeSubtitle->setAnchorPoint(ccp(0, 0.5f));
+        bestPracticeSubtitle->setAnchorPoint(ccp(0.f, 0.5f));
         practiceMenu->addChild(bestPracticeSubtitle);
 
 		PracticeRunStats bestPracticeRun = StatsManager::getBestPractice();
@@ -162,12 +162,12 @@ protected:
             formatDuration(bestPracticeRun.time_played) + " / " +
             std::to_string(bestPracticeRun.checkpoints)).c_str(), bigFontName);
 
-        bestPracticeAttemptsLabel->setAnchorPoint(ccp(0, 0.5f));
+        bestPracticeAttemptsLabel->setAnchorPoint(ccp(0.f, 0.5f));
         bestPracticeAttemptsLabel->setPosition(ccp(bestPracticeSubtitle->getPositionX(), bestPracticeSubtitle->getPositionY() - 12));
         practiceMenu->addChild(bestPracticeAttemptsLabel);
 
         CCLabelBMFont* firstPracticeSubtitle = CCLabelBMFont::create("First", goldFontName);
-		firstPracticeSubtitle->setAnchorPoint(ccp(0, 0.5f));
+		firstPracticeSubtitle->setAnchorPoint(ccp(0.f, 0.5f));
         practiceMenu->addChild(firstPracticeSubtitle);
 
 		PracticeRunStats firstPracticeRun = StatsManager::getFirstPractice();
@@ -176,12 +176,12 @@ protected:
             formatDuration(firstPracticeRun.time_played) + " / " +
             std::to_string(firstPracticeRun.checkpoints)).c_str(), bigFontName);
 
-        firstPracticeAttemptsLabel->setAnchorPoint(ccp(0, 0.5f));
+        firstPracticeAttemptsLabel->setAnchorPoint(ccp(0.f, 0.5f));
         firstPracticeAttemptsLabel->setPosition(ccp(firstPracticeSubtitle->getPositionX(), firstPracticeSubtitle->getPositionY() - 12));
         practiceMenu->addChild(firstPracticeAttemptsLabel);
 
         CCLabelBMFont* lastPracticeSubtitle = CCLabelBMFont::create("Last", goldFontName);
-		lastPracticeSubtitle->setAnchorPoint(ccp(0, 0.5f));
+		lastPracticeSubtitle->setAnchorPoint(ccp(0.f, 0.5f));
         practiceMenu->addChild(lastPracticeSubtitle);
 
         PracticeRunStats lastPracticeRun = StatsManager::getLastPractice();
@@ -190,7 +190,7 @@ protected:
             formatDuration(lastPracticeRun.time_played) + " / " +
             std::to_string(lastPracticeRun.checkpoints)).c_str(), bigFontName);
 
-        lastPracticeAttemptsLabel->setAnchorPoint(ccp(0, 0.5f));
+        lastPracticeAttemptsLabel->setAnchorPoint(ccp(0.f, 0.5f));
         lastPracticeAttemptsLabel->setPosition(ccp(lastPracticeSubtitle->getPositionX(), lastPracticeSubtitle->getPositionY() - 12));
         practiceMenu->addChild(lastPracticeAttemptsLabel);
 
@@ -209,7 +209,7 @@ protected:
             this,
             menu_selector(StatsPopup::onPracticeInfo));
         optsMenu->addChild(infoBtn);
-        m_mainLayer->addChildAtPosition(optsMenu, Anchor::TopRight, ccp(60, -10));
+        m_mainLayer->addChildAtPosition(optsMenu, Anchor::TopRight, ccp(60.f, -10.f));
         return true;
     }
 

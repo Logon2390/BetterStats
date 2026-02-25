@@ -21,7 +21,7 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyLevelSelectLayer::onStatsPopup));
 		statsBtn->setID("betterStats-button"_spr);
-		statsBtn->setPosition({ -30, 0 });
+		statsBtn->setPosition({ -30.f, 0.f });
 
         auto menu = this->getChildByIDRecursive("info-menu");
         if(menu != nullptr) {
