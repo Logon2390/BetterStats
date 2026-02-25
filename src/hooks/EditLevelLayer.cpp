@@ -3,50 +3,31 @@
 using namespace geode::prelude;
 
 #include <Geode/modify/EditLevelLayer.hpp>
-#include <Geode/modify/FLAlertLayer.hpp>
-#include "../shared/LevelData.hpp"
+#include "../managers/DataManager.hpp"
+#include "../ui/StatsPopup.cpp"
 
 class $modify(MyEditLevelLayer, EditLevelLayer){
     bool init(GJGameLevel * level){
         if (!EditLevelLayer::init(level)) return false;
-        data = loadData(level);
+        DataManager::load(level);
 
-        auto myInfoBtn = CCMenuItemSpriteExtra::create(
-            CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-            this,
-            menu_selector(MyEditLevelLayer::myoninfoBtn));
+        auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
+		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyEditLevelLayer::onStatsPopup));
+        statsBtn->setID("betterStats-button"_spr);
+		statsBtn->setPosition({ 30.f, 0.f });
 
-        auto infoBtn = this->getChildByIDRecursive("info-button");
-
-        if(infoBtn != nullptr){
-            myInfoBtn->setPosition(infoBtn->getPosition());
-            infoBtn->getParent()->addChild(myInfoBtn);
-            infoBtn->setVisible(false);
+        auto menu = this->getChildByIDRecursive("info-button-menu");
+        if(menu != nullptr){
+            menu->addChild(statsBtn);
+			menu->updateLayout();
         }
         return true;
     }
 
 
-    // ik this is awkward
-    void myoninfoBtn(CCObject *)
+    void onStatsPopup(CCObject *)
     {
-        std::string title = std::string(m_level->m_levelName);
-
-        FLAlertLayer::create(title.c_str(), dataText(m_level, data), "OK")->show();
-        CCScene* const& currentScene = CCDirector::sharedDirector()->getRunningScene();
-
-        if (currentScene)
-        {
-            auto fltLayer = currentScene->getChildByID("FLAlertLayer");
-			auto layer = fltLayer->getChildByID("main-layer");
-			auto flMenu = layer->getChildByID("main-menu");
-            auto infoBtn = CCMenuItemSpriteExtra::create(
-                CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png"),
-                this, menu_selector(EditLevelLayer::onLevelInfo));
-
-            infoBtn->setPosition(ccp(125, -5));
-            flMenu->addChild(infoBtn);
-            layer->updateLayout();
-        }
+		auto dificultySprite = GJDifficultySprite::create(0, GJDifficultyName::Short);
+		StatsPopup::create(m_level, dificultySprite)->show();
     }
 };
