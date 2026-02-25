@@ -84,7 +84,7 @@ bool DataManager::loadLegacy(GJGameLevel* level) {
         ? keyModern
         : keyDefault;
 
-    if (!Mod::get()->hasSavedValue(key)) return false;
+    if (!Mod::get()->hasSavedValue(key)) return true;
 
     auto legacy = Mod::get()->getSavedValue<LegacyStats>(key);
     StatsManager::mapLegacyData(legacy);
