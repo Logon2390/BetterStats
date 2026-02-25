@@ -200,6 +200,7 @@ protected:
         CCMenu* optsMenu = CCMenu::create();
         optsMenu->setLayout(RowLayout::create());
         optsMenu->setZOrder(2);
+		optsMenu->setAnchorPoint(ccp(0.f, 0.f));
 
         CCSprite* infoIcon = CCSprite::createWithSpriteFrameName(infoIconName);
         infoIcon->setScale(0.5f);
@@ -209,7 +210,7 @@ protected:
             this,
             menu_selector(StatsPopup::onPracticeInfo));
         optsMenu->addChild(infoBtn);
-        m_mainLayer->addChildAtPosition(optsMenu, Anchor::TopRight, ccp(60.f, -10.f));
+        practiceRunsBG->addChildAtPosition(optsMenu, Anchor::TopRight, ccp(-10.f, -10.f));
         return true;
     }
 

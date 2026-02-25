@@ -63,7 +63,7 @@ protected:
                     std::to_string(i) + "%: " +
                     std::to_string(deaths);
 
-                auto label = CCLabelBMFont::create(text.c_str(), "ChatFont.fnt");
+                auto label = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
                 label->setScale(0.35f);
                 label->setAnchorPoint({ 0.f, 0.5f });
 

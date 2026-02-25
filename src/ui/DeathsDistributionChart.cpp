@@ -26,7 +26,7 @@ protected:
         CCSprite* separator = CCSprite::createWithSpriteFrameName("floorLine_001.png");
         separator->setScaleX(0.4f);
 
-        CCLabelBMFont* title = CCLabelBMFont::create("Deaths Distribution", "GoldFont.fnt");
+        CCLabelBMFont* title = CCLabelBMFont::create("Deaths Distribution", "goldFont.fnt");
 		title->setScale(0.35f);
 		title->setAnchorPoint({ 0.f, 0.5f });
 
