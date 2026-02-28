@@ -1,9 +1,23 @@
 # <cb>BetterStats</c>
-BetterStats enhances the default level stats window by providing detailed and useful statistics, 
-allowing players to track their progress and performance in every level.
+BetterStats adds a dedicated statistics popup with an improved UI 
+and advanced data to help you better understand your performance on every level.
 
-# <cg>Features</c>
-- Normal Mode Attempts.
-- Practice Mode Attempts.
-- Time Played.
-- First And Best Practice Run Tracking.
+# <cg>General Statistics</c>
+- Normal Mode attempts
+- Practice Mode attempts
+- Total time played
+- Last played date
+- Completion date
+
+# <cg>Practice Run Details</c>
+- Practice time played
+- Completion tracking
+- Run time tracking
+- Checkpoint count tracking
+
+# <cg>Death Analytics for clasic levels</c>
+- Death count per percentage
+- Visual death distribution chart
+
+
+Feel free to report any bugs or submit feature requests on [GitHub Issues](https://github.com/Logon2390/BetterStats/issues).

@@ -1,3 +1,14 @@
+# 2.0.0
+- Improved UI.
+- Added tracking for:
+  - Practice time
+  - Last played date
+  - Completion date
+  - Practice run completion
+  - Practice run time
+  - Practice run checkpoints
+  - Death count tracking by percentage for clasic levels.
+
 # 1.1.0
 - Added support for Main levels.
 - Added support for Editor levels.
