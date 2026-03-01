@@ -11,7 +11,15 @@ class StatsPopup : public geode::Popup
 protected:
     bool init(GJGameLevel* const& level, GJDifficultySprite* difficultySprite)
     {
-        if (!Popup::init(440.f, 260.f)) return false;
+        if (!level) return false;
+
+		bool isPlatformer = level->isPlatformer();
+		float xOffset = isPlatformer ? 0.f : -95.f;
+		float titleScale = (isPlatformer && level->m_levelName.length() > 12) ? 0.5f : 0.7f;
+		float width = isPlatformer ? 240.f : 440.f;
+		float height = 260.f;
+
+        if (!Popup::init(width, height)) return false;
 
         const char* cornerSpriteName = "rewardCorner_001.png";
         const char* accuracySpriteName = "pathIcon_09_001.png";
@@ -20,42 +28,49 @@ protected:
         const char* bigFontName = "bigFont.fnt";
         const char* goldFontName = "goldFont.fnt";
 
-        CCSprite* BottomLeftSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(BottomLeftSprite, Anchor::BottomLeft, ccp(25.f, 25.f));
+        CCSprite* bottomLeftSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
+        m_mainLayer->addChildAtPosition(bottomLeftSprite, Anchor::BottomLeft);
+        bottomLeftSprite->setAnchorPoint(ccp(0.f, 0.f));
 
-        CCSprite* cornerSprite2 = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(cornerSprite2, Anchor::TopLeft, ccp(25.f, -25.f));
-        cornerSprite2->setRotation(90.f);
+        CCSprite* topLeftSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
+        m_mainLayer->addChildAtPosition(topLeftSprite, Anchor::TopLeft);
+		topLeftSprite->setAnchorPoint(ccp(0.f, 1.f));
+		topLeftSprite->setFlipY(true);
 
-        CCSprite* cornerSprite3 = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(cornerSprite3, Anchor::BottomRight, ccp(-25.f, 25.f));
-        cornerSprite3->setRotation(270.f);
+        CCSprite* bottomRightSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
+        m_mainLayer->addChildAtPosition(bottomRightSprite, Anchor::BottomRight);
+		bottomRightSprite->setFlipX(true);
+		bottomRightSprite->setAnchorPoint(ccp(1.f, 0.f));
 
-        CCSprite* cornerSprite4 = CCSprite::createWithSpriteFrameName(cornerSpriteName);
-        m_mainLayer->addChildAtPosition(cornerSprite4, Anchor::TopRight, ccp(-25.f, -25.f));
-        cornerSprite4->setRotation(180.f);
+        CCSprite* topRightSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
+        m_mainLayer->addChildAtPosition(topRightSprite, Anchor::TopRight);
+		topRightSprite->setAnchorPoint(ccp(1.f, 1.f));
+		topRightSprite->setFlipX(true);
+		topRightSprite->setFlipY(true);
 
         CCScale9Sprite* practiceRunsBG = cocos2d::extension::CCScale9Sprite::create(backgroundName, { 0.0f, 0.0f, 80.0f, 80.0f });
-        m_mainLayer->addChildAtPosition(practiceRunsBG, Anchor::Center, ccp(-95.f, -70.f));
+        m_mainLayer->addChildAtPosition(practiceRunsBG, Anchor::Center, ccp(xOffset, -70.f));
         practiceRunsBG->setContentSize({ 200.f, 75.f });
         practiceRunsBG->setColor({ 130, 64, 33 });
         practiceRunsBG->setZOrder(1);
         practiceRunsBG->setID("practiceRunsBG"_spr);
 
         CCScale9Sprite* completionBG = cocos2d::extension::CCScale9Sprite::create(backgroundName, { 0.0f, 0.0f, 80.0f, 80.0f });
-        m_mainLayer->addChildAtPosition(completionBG, Anchor::Center, ccp(-95.f, 15.f));
+        m_mainLayer->addChildAtPosition(completionBG, Anchor::Center, ccp(xOffset, 15.f));
         completionBG->setContentSize({ 200.f, 75.f });
         completionBG->setColor({ 130, 64, 33 });
         completionBG->setZOrder(1);
         completionBG->setID("completionBG"_spr);
 
-        CCScale9Sprite* chart = DeathsDistributionChart::create();
-        m_mainLayer->addChildAtPosition(chart, Anchor::Center, ccp(105.0f, -27.5f));
+        if (!isPlatformer) {
+            CCScale9Sprite* chart = DeathsDistributionChart::create();
+            m_mainLayer->addChildAtPosition(chart, Anchor::Center, ccp(105.0f, -27.5f));
+        }
 
         CCLabelBMFont* titleLabel = CCLabelBMFont::create(std::string(level->m_levelName).c_str(), goldFontName);
 		m_mainLayer->addChild(titleLabel);
         titleLabel->setPosition(ccp(67.0f, 233.0f));
-        titleLabel->setScale(0.7f);
+		titleLabel->setScale(titleScale);
         titleLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         GJDifficultySprite* difficulty = new GJDifficultySprite(*difficultySprite);
@@ -93,8 +108,8 @@ protected:
         CCNode* statsMenu = CCNode::create();
         CCNode* practiceMenu = CCNode::create();
 
-        m_mainLayer->addChildAtPosition(statsMenu, Anchor::Center, ccp(-190.f, 15.f));
-        m_mainLayer->addChildAtPosition(practiceMenu, Anchor::Center, ccp(-190.f, -70.f));
+        completionBG->addChildAtPosition(statsMenu, Anchor::Left, ccp(10.f, 0.f));
+        practiceRunsBG->addChildAtPosition(practiceMenu, Anchor::Left, ccp(10.f, 0.f));
 
         statsMenu->setZOrder(2);
         statsMenu->setScale(0.35f);
