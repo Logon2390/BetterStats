@@ -2,6 +2,7 @@
 #include <Geode/binding/GJDifficultySprite.hpp>
 #include "../managers/StatsManager.hpp"
 #include "../utils/Formatters.hpp"
+#include <string>
 #include "DeathsDistributionChart.cpp"
 
 using namespace geode::prelude;
@@ -15,7 +16,7 @@ protected:
 
 		bool isPlatformer = level->isPlatformer();
 		float xOffset = isPlatformer ? 0.f : -95.f;
-		float titleScale = (isPlatformer && level->m_levelName.length() > 12) ? 0.5f : 0.7f;
+		float titleScale = (isPlatformer && std::string(level->m_levelName).length() > 12) ? 0.5f : 0.7f;
 		float width = isPlatformer ? 240.f : 440.f;
 		float height = 260.f;
 
