@@ -150,7 +150,3 @@ std::array<float, 10> StatsManager::getNormalizedDeathsDistribution() {
 
     return normalized;
 }
-
-bool StatsManager::isLevelComplete(GJGameLevel* level) {
-    return level->getNormalPercent() == 100;
-}

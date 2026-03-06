@@ -27,7 +27,6 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
 
     void onStatsPopup(CCObject *)
     {
-		auto dificultySprite = GJDifficultySprite::create(0, GJDifficultyName::Short);
-		StatsPopup::create(m_level, dificultySprite)->show();
+		StatsPopup::create(m_level, 0)->show();
     }
 };

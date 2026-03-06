@@ -4,13 +4,14 @@
 #include "../utils/Formatters.hpp"
 #include <string>
 #include "DeathsDistributionChart.cpp"
+#include "../utils/LevelUtils.hpp"
 
 using namespace geode::prelude;
 
 class StatsPopup : public geode::Popup
 {
 protected:
-    bool init(GJGameLevel* const& level, GJDifficultySprite* difficultySprite)
+    bool init(GJGameLevel* const& level, int difficulty)
     {
         if (!level) return false;
 
@@ -74,9 +75,10 @@ protected:
 		titleLabel->setScale(titleScale);
         titleLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
-        GJDifficultySprite* difficulty = new GJDifficultySprite(*difficultySprite);
-        m_mainLayer->addChildAtPosition(difficulty, Anchor::TopLeft, ccp(40.0f, -45.0f));
-        difficulty->setScale(0.9f);
+		auto difficultSprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
+        difficultSprite->updateFeatureStateFromLevel(level);
+        m_mainLayer->addChildAtPosition(difficultSprite, Anchor::TopLeft, ccp(40.0f, -45.0f));
+        difficultSprite->setScale(0.9f);
 
         CCLabelBMFont* timeLabel = CCLabelBMFont::create(("Time Played: " + StatsManager::getTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(timeLabel);
@@ -92,7 +94,7 @@ protected:
         practiceTimeLabel->setPosition(ccp((timeLabel->getPositionX() + timeLabel->getScaledContentWidth()), 217));
 
         CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + 
-            StatsManager::getLastPlayed(StatsManager::isLevelComplete(level))).c_str(), bigFontName);
+            StatsManager::getLastPlayed(isLevelComplete(level))).c_str(), bigFontName);
 
         m_mainLayer->addChild(lastPlayedTimeLabel);
         lastPlayedTimeLabel->setScale(0.3f);
@@ -100,7 +102,7 @@ protected:
         lastPlayedTimeLabel->setPosition(ccp(67.f, 207.f));
 
         CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + 
-            StatsManager::getCompleteDate(StatsManager::isLevelComplete(level))).c_str(), bigFontName);
+            StatsManager::getCompleteDate(isLevelComplete(level))).c_str(), bigFontName);
         m_mainLayer->addChild(completedLabel);
         completedLabel->setScale(0.3f);
         completedLabel->setAnchorPoint(ccp(0.f, 0.5f));
@@ -240,10 +242,10 @@ protected:
     }
 
 public:
-    static StatsPopup* create(GJGameLevel* const& level, GJDifficultySprite* difficultySprite)
+    static StatsPopup* create(GJGameLevel* const& level, int difficulty)
     {
         auto popup = new StatsPopup();
-        if (popup->init(level, difficultySprite))
+        if (popup->init(level, difficulty))
         {
             popup->autorelease();
             return popup;

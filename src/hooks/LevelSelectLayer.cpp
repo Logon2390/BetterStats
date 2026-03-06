@@ -49,8 +49,7 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
             if (load) 
             {
                 int difficulty = static_cast<int>(currentLevel->m_difficulty);
-                auto dificultySprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
-                StatsPopup::create(currentLevel, dificultySprite)->show();
+                StatsPopup::create(currentLevel, difficulty)->show();
             }
             else 
             {

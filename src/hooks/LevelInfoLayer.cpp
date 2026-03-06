@@ -5,6 +5,7 @@ using namespace geode::prelude;
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include "../managers/DataManager.hpp"
 #include "../ui/StatsPopup.cpp"
+#include "../utils/LevelUtils.hpp"
 
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	bool init(GJGameLevel* level, bool challenge) {
@@ -26,6 +27,6 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 	}
 
 	void onStatsPopup(CCObject*) {
-		StatsPopup::create(m_level, m_difficultySprite)->show();
+		StatsPopup::create(m_level, getLevelDifficulty(m_level))->show();
 	}
 };
