@@ -27,6 +27,8 @@ int getLevelDifficulty(GJGameLevel* level) {
         default: return static_cast<int>(GJDifficulty::NA);
         }
 	}
+
+	return static_cast<int>(GJDifficulty::NA);
 }
 
 bool isLevelComplete(GJGameLevel* level) {

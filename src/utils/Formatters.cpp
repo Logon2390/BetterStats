@@ -45,10 +45,16 @@ std::string formatDate(int64_t timestamp)
 {
     std::time_t time = static_cast<std::time_t>(timestamp);
 
-    std::tm* tm = std::localtime(&time);
+    std::tm tm{};
+
+#ifdef _WIN32
+    localtime_s(&tm, &time);
+#else
+    localtime_r(&time, &tm);
+#endif
 
     std::stringstream ss;
-    ss << std::put_time(tm, "%d/%m/%Y %H:%M");
+    ss << std::put_time(&tm, "%d/%m/%Y %H:%M");
 
     return ss.str();
 }
