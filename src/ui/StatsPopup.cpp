@@ -1,8 +1,10 @@
 #include <Geode/Geode.hpp>
 #include <Geode/binding/GJDifficultySprite.hpp>
+#include <Geode/ui/LazySprite.hpp>
 #include "../managers/StatsManager.hpp"
 #include "../utils/Formatters.hpp"
 #include <string>
+#include <Geode/loader/Mod.hpp>
 #include "DeathsDistributionChart.cpp"
 #include "../utils/LevelUtils.hpp"
 
@@ -11,7 +13,7 @@ using namespace geode::prelude;
 class StatsPopup : public geode::Popup
 {
 protected:
-    bool init(GJGameLevel* const& level, int difficulty)
+    bool init(GJGameLevel* const& level, int difficulty, bool thumbnail = true)
     {
         if (!level) return false;
 
@@ -30,25 +32,66 @@ protected:
         const char* bigFontName = "bigFont.fnt";
         const char* goldFontName = "goldFont.fnt";
 
+        if (thumbnail) {
+            LazySprite* imgThumbnail = LazySprite::create({ 0.f, 0.f }, false);
+            imgThumbnail->setLoadCallback([imgThumbnail, width](Result<> res) {
+                if (res) {
+                    auto tex = imgThumbnail->getTexture();
+                    if (!tex) return;
+
+                    auto texSize = tex->getContentSize();
+
+                    float cropWidth = width - 6.5f;
+                    float cropHeight = 70.f;
+
+                    float x = (texSize.width - cropWidth) / 2.f;
+                    float y = (texSize.height - cropHeight) / 2.f;
+
+                    imgThumbnail->setTextureRect({ x, y, cropWidth, cropHeight });
+                    imgThumbnail->setZOrder(1);
+                    imgThumbnail->setScale(1.f);
+                    imgThumbnail->setAnchorPoint(ccp(0.5f, 1.f));
+
+                    auto gradient = CCLayerGradient::create(
+                        { 0,0,0,0 },
+                        { 153,85,51,255 },
+                        { 0, -1 }
+                    );
+
+                    gradient->setContentSize({ cropWidth, cropHeight });
+                    gradient->setPosition({ 0.f, 0.f });
+
+                    imgThumbnail->addChild(gradient, 3);
+                }
+                });
+
+            imgThumbnail->loadFromUrl(fmt::format("https://levelthumbs.prevter.me/thumbnail/{}", level->m_levelID.value()));
+            m_mainLayer->addChildAtPosition(imgThumbnail, Anchor::Top, ccp(0.f, -1.f));
+        }
+
         CCSprite* bottomLeftSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
         m_mainLayer->addChildAtPosition(bottomLeftSprite, Anchor::BottomLeft);
         bottomLeftSprite->setAnchorPoint(ccp(0.f, 0.f));
+		bottomLeftSprite->setZOrder(2);
 
         CCSprite* topLeftSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
         m_mainLayer->addChildAtPosition(topLeftSprite, Anchor::TopLeft);
 		topLeftSprite->setAnchorPoint(ccp(0.f, 1.f));
 		topLeftSprite->setFlipY(true);
+		topLeftSprite->setZOrder(2);
 
         CCSprite* bottomRightSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
         m_mainLayer->addChildAtPosition(bottomRightSprite, Anchor::BottomRight);
 		bottomRightSprite->setFlipX(true);
 		bottomRightSprite->setAnchorPoint(ccp(1.f, 0.f));
+        bottomRightSprite->setZOrder(2);
 
         CCSprite* topRightSprite = CCSprite::createWithSpriteFrameName(cornerSpriteName);
         m_mainLayer->addChildAtPosition(topRightSprite, Anchor::TopRight);
 		topRightSprite->setAnchorPoint(ccp(1.f, 1.f));
 		topRightSprite->setFlipX(true);
 		topRightSprite->setFlipY(true);
+        topRightSprite->setZOrder(2);
 
         CCScale9Sprite* practiceRunsBG = cocos2d::extension::CCScale9Sprite::create(backgroundName, { 0.0f, 0.0f, 80.0f, 80.0f });
         m_mainLayer->addChildAtPosition(practiceRunsBG, Anchor::Center, ccp(xOffset, -70.f));
@@ -74,17 +117,20 @@ protected:
         titleLabel->setPosition(ccp(67.0f, 233.0f));
 		titleLabel->setScale(titleScale);
         titleLabel->setAnchorPoint(ccp(0.f, 0.5f));
+		titleLabel->setZOrder(2);
 
 		auto difficultSprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
         difficultSprite->updateFeatureStateFromLevel(level);
         m_mainLayer->addChildAtPosition(difficultSprite, Anchor::TopLeft, ccp(40.0f, -45.0f));
         difficultSprite->setScale(0.9f);
+		difficultSprite->setZOrder(2);
 
         CCLabelBMFont* timeLabel = CCLabelBMFont::create(("Time Played: " + StatsManager::getTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(timeLabel);
         timeLabel->setScale(0.3f);
         timeLabel->setAnchorPoint(ccp(0.f, 0.5f));
         timeLabel->setPosition(ccp(67.f, 217.f));
+		timeLabel->setZOrder(2);
 
         CCLabelBMFont* practiceTimeLabel = CCLabelBMFont::create((" • "  + StatsManager::getPracticeTimePlayed()).c_str(), bigFontName);
         m_mainLayer->addChild(practiceTimeLabel);
@@ -92,6 +138,7 @@ protected:
         practiceTimeLabel->setAnchorPoint(ccp(0.f, 0.5f));
         practiceTimeLabel->setColor({ 124, 255, 255 });
         practiceTimeLabel->setPosition(ccp((timeLabel->getPositionX() + timeLabel->getScaledContentWidth()), 217));
+		practiceTimeLabel->setZOrder(2);
 
         CCLabelBMFont* lastPlayedTimeLabel = CCLabelBMFont::create(("Last Played: " + 
             StatsManager::getLastPlayed(isLevelComplete(level))).c_str(), bigFontName);
@@ -100,6 +147,7 @@ protected:
         lastPlayedTimeLabel->setScale(0.3f);
         lastPlayedTimeLabel->setAnchorPoint(ccp(0.f, 0.5f));
         lastPlayedTimeLabel->setPosition(ccp(67.f, 207.f));
+		lastPlayedTimeLabel->setZOrder(2);
 
         CCLabelBMFont* completedLabel = CCLabelBMFont::create(("Complete date: " + 
             StatsManager::getCompleteDate(isLevelComplete(level))).c_str(), bigFontName);
@@ -107,6 +155,7 @@ protected:
         completedLabel->setScale(0.3f);
         completedLabel->setAnchorPoint(ccp(0.f, 0.5f));
         completedLabel->setPosition(ccp(67.f, 197.f));
+		completedLabel->setZOrder(2);
 
         CCNode* statsMenu = CCNode::create();
         CCNode* practiceMenu = CCNode::create();
@@ -242,10 +291,10 @@ protected:
     }
 
 public:
-    static StatsPopup* create(GJGameLevel* const& level, int difficulty)
+    static StatsPopup* create(GJGameLevel* const& level, int difficulty, bool thumbnail = true)
     {
         auto popup = new StatsPopup();
-        if (popup->init(level, difficulty))
+        if (popup->init(level, difficulty, thumbnail))
         {
             popup->autorelease();
             return popup;

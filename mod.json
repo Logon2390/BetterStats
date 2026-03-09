@@ -32,6 +32,10 @@
 		"cvolton.level-id-api": {
 			"version": "v2.0.0",
 			"required": true
+		},
+		"prevter.imageplus": {
+			"version": "v1.1.0",
+			"required": true
 		}
 	}
 }

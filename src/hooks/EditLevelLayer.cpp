@@ -27,6 +27,6 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
 
     void onStatsPopup(CCObject *)
     {
-		StatsPopup::create(m_level, 0)->show();
+		StatsPopup::create(m_level, 0, false)->show();
     }
 };
