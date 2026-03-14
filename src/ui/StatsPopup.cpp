@@ -313,7 +313,7 @@ protected:
     }
 
     std::string getThumbnailQuality() {
-#ifdef GEODE_DESKTOP
+#ifdef GEODE_IS_DESKTOP
         return "high";
 #endif
         return "small";
