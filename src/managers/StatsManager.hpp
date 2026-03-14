@@ -67,5 +67,4 @@ public:
     static int getMostDeadlyPercent();
     static std::array<int, 10> getDeathsDistributionByRange();
     static std::array<float, 10> getNormalizedDeathsDistribution();
-	static bool isLevelComplete(GJGameLevel* level);
 };

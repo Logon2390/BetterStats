@@ -25,7 +25,7 @@ class $modify(PlayLayer){
 		bool validPracticeRun = false;
 		bool savePracticeData = false;
 		bool isPracticeMode = false;
-		bool isLevelComplete = true;
+		bool isLevelComplete = false;
 	};
 
 	bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects){
@@ -39,14 +39,17 @@ class $modify(PlayLayer){
 	void levelComplete(){
 		if(m_fields->isPracticeMode && m_fields->validPracticeRun){
 			m_fields->savePracticeData = true;
-			m_fields->isLevelComplete = true;
-			m_fields->practiceRunsCompleted++;
-			m_fields->currentPracticeRun.time_played += m_fields->practiceAttemptTime + this->m_attemptTime;
-			m_fields->bestPracticeRun = m_fields->bestPracticeRun.attempts == 0  ? 
-				m_fields->currentPracticeRun : StatsManager::comparePracticeRuns(m_fields->currentPracticeRun, m_fields->bestPracticeRun);
-
+			
+			// Only count practice runs if the level wasn't already set as completed
+			if (!m_fields->isLevelComplete) {
+				m_fields->practiceRunsCompleted++;
+				m_fields->currentPracticeRun.time_played += m_fields->practiceAttemptTime + this->m_attemptTime;
+				m_fields->bestPracticeRun = m_fields->bestPracticeRun.attempts == 0 ?
+					m_fields->currentPracticeRun : StatsManager::comparePracticeRuns(m_fields->currentPracticeRun, m_fields->bestPracticeRun);
+			}
+			
 			if (StatsManager::getLevelData().practice_stats.first_practice.attempts == 0) {
-				StatsManager::getLevelData().practice_stats.first_practice = m_fields->currentPracticeRun;
+				StatsManager::getLevelData().practice_stats.first_practice = m_fields->bestPracticeRun;
 			}
 		}
 
@@ -54,6 +57,7 @@ class $modify(PlayLayer){
 			StatsManager::getLevelData().completed_date = StatsManager::getCurrentDate();
 		}
 
+		m_fields->isLevelComplete = true;
 		PlayLayer::levelComplete();
 	}
 
@@ -66,7 +70,7 @@ class $modify(PlayLayer){
 	}
 
 	void updateAttempts(){
-		if(m_isPracticeMode) {
+		if(m_isPracticeMode && !m_fields->isLevelComplete) {
 			m_fields->practiceAttempts++;
 			m_fields->currentPracticeRun.attempts++;
 		}
@@ -74,17 +78,24 @@ class $modify(PlayLayer){
 	}
 
 	void resetLevel(){
-		m_fields->isLevelComplete = false;
 		m_fields->attemptTime += this->m_attemptTime;
-		m_fields->practiceAttemptTime += (m_fields->isPracticeMode) ? this->m_attemptTime : 0;
 		m_fields->validPracticeRun = m_fields->validPracticeRun
 			|| (m_isPracticeMode && m_checkpointArray->count() == 0);
+
+		if (m_fields->isPracticeMode && !m_fields->isLevelComplete) {
+			m_fields->practiceAttemptTime += this->m_attemptTime;
+		}
 
 		PlayLayer::resetLevel();
 	}
 
+	void fullReset() {
+		m_fields->isLevelComplete = false;
+		return PlayLayer::fullReset();
+	}
+
 	CheckpointObject* createCheckpoint(){
-		if (m_fields->isPracticeMode) {
+		if (m_fields->isPracticeMode && !m_fields->isLevelComplete) {
 			m_fields->currentPracticeRun.checkpoints++;
 		}
 

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+#include <Geode/utils/general.hpp>
 
 
 int64_t getCurrentTimestamp()
@@ -44,14 +45,13 @@ std::string formatDuration(double secondsInput)
 std::string formatDate(int64_t timestamp)
 {
     std::time_t time = static_cast<std::time_t>(timestamp);
-
-    std::tm* tm = std::localtime(&time);
+	std::tm tm = geode::localtime(time);
 
     std::stringstream ss;
-    ss << std::put_time(tm, "%d/%m/%Y %H:%M");
+    ss << std::put_time(&tm, "%d/%m/%Y %H:%M");
 
     return ss.str();
-}
+}   
 
 std::string formatRelativeTime(int64_t timestamp)
 {

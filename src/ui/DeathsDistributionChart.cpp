@@ -15,7 +15,7 @@ protected:
         this->setContentSize({ 180.f, 160.f });
         this->setColor({ 130, 64, 33 });
         this->setZOrder(1);
-        this->setID("DeathsChartsBG"_spr);
+        this->setID("DeathChart"_spr);
 
         auto distribution = StatsManager::getDeathsDistributionByRange();
         auto normalizedDistribution = StatsManager::getNormalizedDeathsDistribution();
