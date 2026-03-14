@@ -20,7 +20,7 @@
 #include <Geode/Enums.hpp>
 #include "DeathsDistributionChart.cpp"
 #include "../utils/LevelUtils.hpp"
-#include "LevelThumbnail.cpp"
+
 
 using namespace geode::prelude;
 
