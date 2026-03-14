@@ -18,6 +18,11 @@
 #include <Geode/binding/FLAlertLayer.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
 #include <Geode/Enums.hpp>
+#include <Geode/cocos/layers_scenes_transitions_nodes/CCLayer.h>
+#include <Geode/loader/Log.hpp>
+#include <Geode/platform/cplatform.h>
+#include <fmt/format.h>
+#include <Geode/Result.hpp>
 #include "DeathsDistributionChart.cpp"
 #include "../utils/LevelUtils.hpp"
 
@@ -232,7 +237,7 @@ protected:
         jumpsLabel->setAnchorPoint(ccp(0.f, 0.5f));
 
         CCLabelBMFont* practiceTitle = CCLabelBMFont::create("Practice Runs", goldFontName);
-        m_mainLayer->addChildAtPosition(practiceTitle, Anchor::Center, ccp(-100.f, -30.f));
+        practiceRunsBG->addChildAtPosition(practiceTitle, Anchor::Top);
         practiceTitle->setScale(0.4f);
         practiceTitle->setZOrder(2);
 
@@ -308,10 +313,10 @@ protected:
     }
 
     std::string getThumbnailQuality() {
-#ifdef GEODE_ANDROID
-		return "small";
+#ifdef GEODE_DESKTOP
+        return "high";
 #endif
-		return "high";
+        return "small";
     }
 
 public:
