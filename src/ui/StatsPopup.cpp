@@ -309,7 +309,7 @@ protected:
 
     std::string getThumbnailQuality() {
 #ifdef GEODE_ANDROID
-		return "medium";
+		return "small";
 #endif
 		return "high";
     }
