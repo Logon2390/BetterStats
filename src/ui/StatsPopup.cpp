@@ -5,8 +5,22 @@
 #include "../utils/Formatters.hpp"
 #include <string>
 #include <Geode/loader/Mod.hpp>
+#include <Geode/cocos/base_nodes/CCNode.h>
+#include <Geode/cocos/cocoa/CCObject.h>
+#include <GUI/CCControlExtension/CCScale9Sprite.h>
+#include <Geode/cocos/label_nodes/CCLabelBMFont.h>
+#include <Geode/cocos/menu_nodes/CCMenu.h>
+#include <Geode/cocos/sprite_nodes/CCSprite.h>
+#include <Geode/cocos/support/CCPointExtension.h>
+#include <Geode/ui/Layout.hpp>
+#include <Geode/ui/Popup.hpp>
+#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
+#include <Geode/binding/FLAlertLayer.hpp>
+#include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/Enums.hpp>
 #include "DeathsDistributionChart.cpp"
 #include "../utils/LevelUtils.hpp"
+#include "LevelThumbnail.cpp"
 
 using namespace geode::prelude;
 
@@ -65,7 +79,10 @@ protected:
                 }
                 });
 
-            imgThumbnail->loadFromUrl(fmt::format("https://levelthumbs.prevter.me/thumbnail/{}", level->m_levelID.value()));
+
+            auto quality = getThumbnailQuality();
+            imgThumbnail->loadFromUrl(fmt::format("https://levelthumbs.prevter.me/thumbnail/{}/{}", level->m_levelID.value(), quality));
+
             m_mainLayer->addChildAtPosition(imgThumbnail, Anchor::Top, ccp(0.f, -1.f));
         }
 
@@ -288,6 +305,13 @@ protected:
             "<cy>Attempts</c> / <cb>Time</c> / <cj>Checkpoints</c>";
 
         FLAlertLayer::create("Info", message, "OK")->show();
+    }
+
+    std::string getThumbnailQuality() {
+#ifdef GEODE_ANDROID
+		return "medium";
+#endif
+		return "high";
     }
 
 public:
