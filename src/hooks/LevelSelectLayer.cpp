@@ -44,18 +44,16 @@ class $modify(MyLevelSelectLayer, LevelSelectLayer) {
         
         if(currentLevel != nullptr)
         {
-            bool load = DataManager::load(currentLevel);
+            DataManager::load(currentLevel);
 
-            if (load) 
+            if (currentLevel->m_levelID.value() > 0)
             {
                 int difficulty = static_cast<int>(currentLevel->m_difficulty);
-                auto dificultySprite = GJDifficultySprite::create(difficulty, GJDifficultyName::Short);
-                StatsPopup::create(currentLevel, dificultySprite)->show();
+                StatsPopup::create(currentLevel, difficulty)->show();
             }
             else 
             {
 				FLAlertLayer::create("?", "This is not a level. What were you expecting to see here ._. ?", "OK")->show();
-
             }
         }
     }

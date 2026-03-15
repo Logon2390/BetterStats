@@ -14,7 +14,11 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
         auto sprite = CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("icon.png"_spr), CircleBaseColor::Blue, CircleBaseSize::Tiny);
 		auto statsBtn = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(MyEditLevelLayer::onStatsPopup));
         statsBtn->setID("betterStats-button"_spr);
-		statsBtn->setPosition({ 30.f, 0.f });
+		statsBtn->setPosition({ 0.f, 30.f });
+
+		// relocate settings button to make room for the stats button
+		auto settingsBtn = this->getChildByIDRecursive("settings-button");
+        settingsBtn->setPositionY(60.f);
 
         auto menu = this->getChildByIDRecursive("info-button-menu");
         if(menu != nullptr){
@@ -27,7 +31,6 @@ class $modify(MyEditLevelLayer, EditLevelLayer){
 
     void onStatsPopup(CCObject *)
     {
-		auto dificultySprite = GJDifficultySprite::create(0, GJDifficultyName::Short);
-		StatsPopup::create(m_level, dificultySprite)->show();
+		StatsPopup::create(m_level, 0, false)->show();
     }
 };
